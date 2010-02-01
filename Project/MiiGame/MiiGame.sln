@@ -1,0 +1,53 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiiGame", "MiiGame\MiiGame.vcproj", "{8212F5D5-C28E-4944-B5AF-87AA71E79931}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C80EA20B-021F-4CEF-9C1D-472EFA7254DB} = {C80EA20B-021F-4CEF-9C1D-472EFA7254DB}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libwbfsNETwrapper", "libwbfsNETwrapper\libwbfsNETwrapper.vcproj", "{C80EA20B-021F-4CEF-9C1D-472EFA7254DB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6D70B4AB-53E0-4C08-8345-DF95820990E7} = {6D70B4AB-53E0-4C08-8345-DF95820990E7}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libwbfs", "libwbfs\libwbfs.vcproj", "{6D70B4AB-53E0-4C08-8345-DF95820990E7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnRAR", "unrar\UnRARDll.vcproj", "{E815C46C-36C4-499F-BBC2-E772C6B17971}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		release_nocrypt|Win32 = release_nocrypt|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8212F5D5-C28E-4944-B5AF-87AA71E79931}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8212F5D5-C28E-4944-B5AF-87AA71E79931}.Debug|Win32.Build.0 = Debug|Win32
+		{8212F5D5-C28E-4944-B5AF-87AA71E79931}.release_nocrypt|Win32.ActiveCfg = Release|Win32
+		{8212F5D5-C28E-4944-B5AF-87AA71E79931}.release_nocrypt|Win32.Build.0 = Release|Win32
+		{8212F5D5-C28E-4944-B5AF-87AA71E79931}.Release|Win32.ActiveCfg = Release|Win32
+		{8212F5D5-C28E-4944-B5AF-87AA71E79931}.Release|Win32.Build.0 = Release|Win32
+		{C80EA20B-021F-4CEF-9C1D-472EFA7254DB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C80EA20B-021F-4CEF-9C1D-472EFA7254DB}.Debug|Win32.Build.0 = Debug|Win32
+		{C80EA20B-021F-4CEF-9C1D-472EFA7254DB}.release_nocrypt|Win32.ActiveCfg = Release|Win32
+		{C80EA20B-021F-4CEF-9C1D-472EFA7254DB}.release_nocrypt|Win32.Build.0 = Release|Win32
+		{C80EA20B-021F-4CEF-9C1D-472EFA7254DB}.Release|Win32.ActiveCfg = Release|Win32
+		{C80EA20B-021F-4CEF-9C1D-472EFA7254DB}.Release|Win32.Build.0 = Release|Win32
+		{6D70B4AB-53E0-4C08-8345-DF95820990E7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6D70B4AB-53E0-4C08-8345-DF95820990E7}.Debug|Win32.Build.0 = Debug|Win32
+		{6D70B4AB-53E0-4C08-8345-DF95820990E7}.release_nocrypt|Win32.ActiveCfg = Release|Win32
+		{6D70B4AB-53E0-4C08-8345-DF95820990E7}.release_nocrypt|Win32.Build.0 = Release|Win32
+		{6D70B4AB-53E0-4C08-8345-DF95820990E7}.Release|Win32.ActiveCfg = Release|Win32
+		{6D70B4AB-53E0-4C08-8345-DF95820990E7}.Release|Win32.Build.0 = Release|Win32
+		{E815C46C-36C4-499F-BBC2-E772C6B17971}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E815C46C-36C4-499F-BBC2-E772C6B17971}.Debug|Win32.Build.0 = Debug|Win32
+		{E815C46C-36C4-499F-BBC2-E772C6B17971}.release_nocrypt|Win32.ActiveCfg = release_nocrypt|Win32
+		{E815C46C-36C4-499F-BBC2-E772C6B17971}.release_nocrypt|Win32.Build.0 = release_nocrypt|Win32
+		{E815C46C-36C4-499F-BBC2-E772C6B17971}.Release|Win32.ActiveCfg = Release|Win32
+		{E815C46C-36C4-499F-BBC2-E772C6B17971}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
