@@ -74,6 +74,7 @@ BEGIN_MESSAGE_MAP(CMiiGameDlg, CDialog)
     ON_BN_CLICKED(IDC_MOVE_RIGHT_BTN, &CMiiGameDlg::OnBnClickedMoveRightBtn)
     ON_BN_CLICKED(IDC_FORMAT_BTN, &CMiiGameDlg::OnBnClickedFormatBtn)
     ON_BN_CLICKED(IDC_DELETE_BTN, &CMiiGameDlg::OnBnClickedDeleteBtn)
+	ON_BN_CLICKED(IDC_DELETE_BTN2, &CMiiGameDlg::OnBnClickedDeleteBtn2)
 END_MESSAGE_MAP()
 
 
@@ -237,8 +238,11 @@ void CMiiGameDlg::SetInformationToList()
     m_diskList.SetRedraw(TRUE);
 }
 
-void CMiiGameDlg::SetImageListContent()
+void CMiiGameDlg::SetImageListContent(bool bCleanOriginalList)
 {
+	m_isoList.SetRedraw(FALSE);
+	if(bCleanOriginalList)
+		m_isoList.DeleteAllItems();
     for(int i = 0; i < m_vecISOEntries.size(); ++i) {
         CString strFileName;
         MB2W(m_vecISOEntries.at(i).m_strDiskName, strFileName);
@@ -247,6 +251,7 @@ void CMiiGameDlg::SetImageListContent()
         strSize.Format(_T("%.2fGB"), m_vecISOEntries.at(i).m_fDiskSize);
         m_isoList.SetItemText(i, 1, strSize);
     }
+	m_isoList.SetRedraw(TRUE);
 }
 
 void CMiiGameDlg::OnBnClickedOpenFileBtn()
@@ -257,9 +262,20 @@ void CMiiGameDlg::OnBnClickedOpenFileBtn()
         POSITION pos = fd.GetStartPosition();
         while(pos != NULL) {
             CString strFilePath = fd.GetNextPathName(pos);
-            m_vecISOEntries.push_back(m_driveControl.GetImageFromHD(strFilePath));
+			strFilePath.Replace(_T("\\\\"), _T("\\"));
+			CImageEntry entry = m_driveControl.GetImageFromHD(strFilePath);
+			bool bAdd = true;
+			for(int i = 0; i < m_vecISOEntries.size(); ++i) {
+				CStringA path = m_vecISOEntries.at(i).m_strImagePath;
+				if(path == entry.m_strImagePath) {
+					bAdd = false;
+					break;
+				}	
+			}
+			if(bAdd)
+				m_vecISOEntries.push_back(entry);
         }
-        SetImageListContent();
+        SetImageListContent(true);
         pos = fd.GetStartPosition();
         CString strFilePath = fd.GetNextPathName(pos);
         CString strFolder = strFilePath.Mid(0, strFilePath.ReverseFind('\\'));
@@ -296,6 +312,13 @@ void __stdcall progress(int status, int total) {
     CMiiGameDlg::Progress(status, total);
 }
 
+//UINT CMiiGameDlg::UploadImageThread(LPVOID pParam) {
+//	CMiiGameDlg* pThis = (CMiiGameDlg*)pParam;
+//	char szNewName[512] = {0};
+//	pThis->m_driveControl.UploadImageToWBFS((char*)pThis->m_vecISOEntries.at(j).m_strImagePath.GetString(),
+//		(progress_callback_t)progress, ONLY_GAME_PARTITION, false, szNewName);
+//}
+
 void CMiiGameDlg::OnBnClickedMoveLeftBtn()
 {
     // Add disk to drive (from your HD to WBFS)
@@ -314,7 +337,24 @@ void CMiiGameDlg::OnBnClickedMoveLeftBtn()
         for(int j = 0; j < m_vecISOEntries.size(); ++j) {
             if(m_vecISOEntries.at(j).m_strDiskName == strSelectedName) {
                 char szNewName[512] = {0};
-                int nCode = AddDiscToDrive((char*)m_vecISOEntries.at(j).m_strImagePath.GetString(), (progress_callback_t)progress, ONLY_GAME_PARTITION, false, szNewName);
+                int nCode = m_driveControl.UploadImageToWBFS((char*)m_vecISOEntries.at(j).m_strImagePath.GetString(), (progress_callback_t)progress, ONLY_GAME_PARTITION, false, szNewName);
+				if(nCode == 0) {
+					AfxMessageBox(_T("Upload to WBFS successfully..."), MB_OK);
+				} else {
+					CString strMsg;
+					switch(nCode) {
+						case -1:
+							strMsg = _T("Partition wasn't loaded previously");
+							break;
+						case -2:
+							strMsg = _T("Error occured while attempting to read file");
+							break;
+						case -3:
+							strMsg = _T("Disc already exists on WBFS drive");
+							break;
+					}
+					AfxMessageBox(strMsg, MB_ICONWARNING | MB_OK);
+				}
             }
         }
     }
@@ -370,3 +410,28 @@ void CMiiGameDlg::OnBnClickedDeleteBtn()
     OnBnClickedLoadBtn();
 }
 
+
+void CMiiGameDlg::OnBnClickedDeleteBtn2()
+{
+	vector<CString> vecSelectName;
+	POSITION pos = m_isoList.GetFirstSelectedItemPosition();
+	if(pos == NULL) return;
+	while(pos != NULL) {
+		int nItem = m_isoList.GetNextSelectedItem(pos);
+		CString strItemText = m_isoList.GetItemText(nItem, 0);
+		vecSelectName.push_back(strItemText);
+	}
+
+	for(int i = 0; i < vecSelectName.size(); ++i) {
+		CStringA strSelectedName;
+		W2MB(vecSelectName.at(i), strSelectedName);
+		vector<CImageEntry>::iterator it = m_vecISOEntries.begin();
+		for(; it != m_vecISOEntries.end(); it++) {
+			if(it->m_strDiskName == strSelectedName) {
+				m_vecISOEntries.erase(it);
+				break;
+			}
+		}
+	}
+	SetImageListContent(true);
+}

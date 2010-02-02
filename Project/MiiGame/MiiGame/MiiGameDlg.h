@@ -2,13 +2,14 @@
 //
 
 #pragma once
-
-#include "DriveControl.h"
-#include "afxwin.h"
-#include "ImageEntry.h"
-#include <vector>
 #include "afxcmn.h"
+#include "afxwin.h"
+#include "DriveControl.h"
+#include "ImageEntry.h"
 #include "EntryListCtrl.h"
+
+#include <vector>
+#include <map>
 
 using namespace std;
 // CMiiGameDlg dialog
@@ -28,6 +29,7 @@ public:
     static void MB2W(const CStringA& a, CString& b);
 	static void Progress(int status, int total);
 private:
+	map<int, CString> m_errorMSg;
     CDriveControl m_driveControl;
     vector<CImageEntry> m_vecDiskEntries;
     vector<CImageEntry> m_vecISOEntries;
@@ -39,8 +41,9 @@ private:
     bool OpenDrive();
     void GetDisks();
     void SetInformationToList();
-    void SetImageListContent();
+    void SetImageListContent(bool bCleanOriginalList);
     void InitListCcontrol();
+	//static UINT UploadImageThread(LPVOID pParam);
 // Implementation
 protected:
 	HICON m_hIcon;
@@ -58,4 +61,6 @@ protected:
     afx_msg void OnBnClickedMoveRightBtn();
     afx_msg void OnBnClickedFormatBtn();
     afx_msg void OnBnClickedDeleteBtn();
+public:
+	afx_msg void OnBnClickedDeleteBtn2();
 };
