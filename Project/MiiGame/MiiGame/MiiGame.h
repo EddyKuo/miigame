@@ -4,7 +4,7 @@
 #pragma once
 
 #ifndef __AFXWIN_H__
-	#error "include 'stdafx.h' before including this file for PCH"
+#error "include 'stdafx.h' before including this file for PCH"
 #endif
 
 #include "resource.h"		// main symbols
@@ -17,15 +17,15 @@
 class CMiiGameApp : public CWinApp
 {
 public:
-	CMiiGameApp();
+    CMiiGameApp();
 
-// Overrides
-	public:
-	virtual BOOL InitInstance();
+    // Overrides
+public:
+    virtual BOOL InitInstance();
 
-// Implementation
+    // Implementation
 
-	DECLARE_MESSAGE_MAP()
+    DECLARE_MESSAGE_MAP()
 };
 
 extern CMiiGameApp theApp;

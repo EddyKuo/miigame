@@ -81,5 +81,5 @@ CImageEntry CDriveControl::GetImageFromHD(CString& strFilePath) {
 }
 
 int CDriveControl::UploadImageToWBFS(char* strImagePath, progress_callback_t pFnCallback, partition_selector_t selector, bool copy1to1, char *newName) {
-	return AddDiscToDrive(strImagePath, (progress_callback_t)pFnCallback, selector, false, newName);
+    return AddDiscToDrive(strImagePath, (progress_callback_t)pFnCallback, selector, false, newName);
 }
