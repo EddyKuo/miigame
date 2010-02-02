@@ -95,6 +95,11 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_DELETE_BTN,192,246,50,14
     CONTROL         "",IDC_LIST4,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,276,24,240,216
     PUSHBUTTON      "Open Files",IDC_OPEN_FILE_BTN,466,7,50,14
+    PUSHBUTTON      "<=",IDC_MOVE_LEFT_BTN,252,48,18,14
+    PUSHBUTTON      "=>",IDC_MOVE_RIGHT_BTN,252,66,18,14
+    PUSHBUTTON      "Delete",IDC_DELETE_BTN2,462,246,50,14
+    COMBOBOX        IDC_FOLDER_COMBO,276,7,187,163,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Format",IDC_FORMAT_BTN,6,246,50,14
 END
 
 
@@ -183,8 +188,6 @@ END
 
 #endif    // Chinese (Taiwan) resources
 /////////////////////////////////////////////////////////////////////////////
-
-
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

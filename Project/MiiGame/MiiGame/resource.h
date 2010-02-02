@@ -15,6 +15,12 @@
 #define IDC_LIST4                       1013
 #define IDC_BUTTON5                     1014
 #define IDC_OPEN_FILE_BTN               1014
+#define IDC_MOVE_LEFT_BTN               1015
+#define IDC_MOVE_RIGHT_BTN              1016
+#define IDC_DELETE_BTN2                 1017
+#define IDC_FOLDER_COMBO                1019
+#define IDC_BUTTON1                     1020
+#define IDC_FORMAT_BTN                  1020
 
 // Next default values for new objects
 // 
@@ -22,7 +28,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        129
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1015
+#define _APS_NEXT_CONTROL_VALUE         1021
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

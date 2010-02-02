@@ -193,6 +193,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EntryListCtrl.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MiiGame.cpp"
 				>
 			</File>
@@ -228,6 +232,10 @@
 			>
 			<File
 				RelativePath=".\DriveControl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\EntryListCtrl.h"
 				>
 			</File>
 			<File
