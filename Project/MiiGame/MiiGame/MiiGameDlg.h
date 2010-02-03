@@ -52,7 +52,7 @@ private:
     void OnEventUploadComplete(long nParam);
     void OnDownloadComplete(long nParam);
     void UpdateUIString(LCID lcid);
-    bool GetFolder(TSTRING& folderpath, const TCHAR* szCaption = NULL, HWND hOwner = NULL);
+    
 
     // Implementation
 protected:
@@ -72,4 +72,6 @@ protected:
     afx_msg void OnBnClickedFormatBtn();
     afx_msg void OnBnClickedDeleteBtn();
     afx_msg void OnBnClickedDeleteBtn2();
+public:
+    afx_msg void OnBnClickedButton2();
 };

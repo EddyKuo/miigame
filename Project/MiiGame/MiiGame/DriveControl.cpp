@@ -9,8 +9,13 @@ CDriveControl::CDriveControl()
     UpdateDrivers();
     DefineNotify(EVENT_UPLOAD_COMPLETE);
     DefineNotify(EVENT_UPLOAD_PROGRESS);
+    DefineNotify(EVENT_UPLOAD_ALL_COMPLETE);
+    DefineNotify(EVENT_UPLOAD_FAILED);
     DefineNotify(EVENT_DOWNLOAD_COMPLETE);
     DefineNotify(EVENT_DOWNLOAD_PROGRESS);
+    DefineNotify(EVENT_DOWNLOAD_ALL_COMPLETE);
+    DefineNotify(EVENT_DOWNLOAD_FAILED);
+
     g_pThis = this;
 }
 
@@ -35,7 +40,7 @@ void CDriveControl::UpdateDrivers() {
 
 bool CDriveControl::OpenDrive(CStringA strDriveLetter) {
     if(!::OpenDrive((char*)strDriveLetter.GetString())) {
-        AfxMessageBox(_T("Open this drive failed..."));
+        AfxMessageBox(GetLocalizationInstance()->GetIDString(_T("IDS_Open_this_drive_failed")));
         return false;
     }
     return true;
@@ -54,9 +59,10 @@ vector<CImageEntry> CDriveControl::GetDiskFromDrive(CStringA strDriveLetter) {
         RegionCode regionCode = NOREGION;
         int nRetCode = GetDiscInfoEx(i, szDiskID, &fDiskSize, szDiskName, & regionCode);
         if(nRetCode < 0) {
-            CString strMessage;
-            strMessage.Format(_T("Get Disk Error ==> #%d"), i);
-            AfxMessageBox(strMessage);
+            CString strMessage = GetLocalizationInstance()->GetIDString(_T("IDS_Get_Disk_Error"));
+            CString strNum;
+            strNum.Format(_T(" ==> #%d"), i);
+            AfxMessageBox(strMessage + strNum);
         } else {
             CImageEntry entry(szDiskName, szDiskID, fDiskSize, regionCode);
             entries.push_back(entry);
@@ -90,11 +96,8 @@ CImageEntry CDriveControl::GetImageFromHD(CString& strFilePath) {
 
 typedef struct upload_param {
     CDriveControl* pThis;
-    CStringA strImagePath;
-    progress_callback_t pFnCallback;
-    partition_selector_t selector;
-    bool copy1to1;
-    char *newName;
+    vector<CString>* pvecSelectName;
+    vector<CImageEntry>* pvecImage;
 } UL_Param;
 
 void __stdcall UploadProgress(int status, int total) {
@@ -102,14 +105,11 @@ void __stdcall UploadProgress(int status, int total) {
     g_pThis->Fire(EVENT_UPLOAD_PROGRESS, nParam);
 }
 
-int CDriveControl::UploadImageToWBFS(CStringA strImagePath, partition_selector_t selector, bool copy1to1, char *newName) {
+int CDriveControl::UploadImageToWBFS(vector<CString>* pvecSelectName, vector<CImageEntry>& vecImage) {
     UL_Param *p = new UL_Param;
     p->pThis = this;
-    p->strImagePath = strImagePath;
-    p->pFnCallback = UploadProgress;
-    p->selector = selector;
-    p->copy1to1 = copy1to1;
-    p->newName = NULL;
+    p->pvecSelectName = pvecSelectName;
+    p->pvecImage = &vecImage;
     CWinThread* thread = AfxBeginThread(CDriveControl::UploadThread, p);
     return 0;
 }
@@ -117,8 +117,19 @@ int CDriveControl::UploadImageToWBFS(CStringA strImagePath, partition_selector_t
 UINT CDriveControl::UploadThread(LPVOID nParam) {
     UL_Param *p = (UL_Param*)nParam;
     char szNewName[512] = {0};
-    int nCode = AddDiscToDrive((char*)p->strImagePath.GetString(), p->pFnCallback, p->selector, false, szNewName);
-    p->pThis->Fire(EVENT_UPLOAD_COMPLETE, nCode);
+    for(int i = 0; i < p->pvecSelectName->size(); ++i) {
+        CStringA strSelectedName;
+        W2MB(p->pvecSelectName->at(i), strSelectedName);
+        for(int j = 0; j < p->pvecImage->size(); ++j) {
+            if(p->pvecImage->at(j).m_strDiskName == strSelectedName) {
+                char szNewName[512] = {0};
+                int nCode = AddDiscToDrive((char*)p->pvecImage->at(j).m_strImagePath.GetString(), UploadProgress, ONLY_GAME_PARTITION, false, szNewName);
+                p->pThis->Fire(EVENT_UPLOAD_COMPLETE, nCode);
+            }
+        }
+    }
+    p->pThis->Fire(EVENT_UPLOAD_ALL_COMPLETE);
+    delete p->pvecSelectName;
     delete p;
     return 0;
 }
@@ -126,8 +137,8 @@ UINT CDriveControl::UploadThread(LPVOID nParam) {
 
 typedef struct download_param {
     CDriveControl* pThis;
-    CStringA strDiskID;
-    CStringA strSaveTo;
+    vector<CString>* pvecSelectName;
+    vector<CImageEntry>* pvecImage;
 } DL_Param;
 
 void __stdcall DownloadProgress(int status, int total) {
@@ -135,21 +146,66 @@ void __stdcall DownloadProgress(int status, int total) {
     g_pThis->Fire(EVENT_DOWNLOAD_PROGRESS, nParam);
 }
 
-int CDriveControl::ExtractDiskToHD(CStringA strGameID, CStringA newFileName) {
+int CDriveControl::ExtractDiskToHD(vector<CString>* pvecSelectName, vector<CImageEntry>& vecImage) {
     DL_Param* p = new DL_Param;
     p->pThis = this;
-    p->strDiskID = strGameID;
-    p->strSaveTo = newFileName;
+    p->pvecSelectName = pvecSelectName;
+    p->pvecImage = &vecImage;
     CWinThread* thread = AfxBeginThread(CDriveControl::ExtractThread, p);
     return 0;
 }
 
 UINT CDriveControl::ExtractThread(LPVOID nParam) {
     DL_Param* p = (DL_Param*)nParam;
-    int nCode = ExtractDiscFromDrive((char*)p->strDiskID.GetString(), DownloadProgress, (char*)p->strSaveTo.GetString());
-    p->pThis->Fire(EVENT_DOWNLOAD_COMPLETE, nCode);
+    TSTRING strPath;
+    p->pThis->GetFolder(strPath, _T("Mii Game Manager"));
+    if(strPath == _T("")) {
+        AfxMessageBox(_T("Please select a folder to download"), MB_ICONINFORMATION, MB_OK);
+        p->pThis->Fire(EVENT_DOWNLOAD_FAILED);
+        delete p->pvecSelectName;
+        delete p;
+        return 0;
+    }
+    for(int i = 0; i < p->pvecSelectName->size(); ++i) {
+        CStringA strSelectedName;
+        W2MB(p->pvecSelectName->at(i), strSelectedName);
+        for(int j = 0; j < p->pvecImage->size(); ++j) {
+            if(p->pvecImage->at(j).m_strDiskName == strSelectedName) {
+                TSTRING strISOLocation = strPath + _T("\\") + TSTRING(p->pvecSelectName->at(i)) + _T(".iso");
+                CStringA straNewName;
+                W2MB(strISOLocation.c_str(), straNewName);
+                int nCode = ExtractDiscFromDrive((char*)p->pvecImage->at(j).m_strDiskID.GetString(), DownloadProgress, (char*)straNewName.GetString());
+                p->pThis->Fire(EVENT_DOWNLOAD_COMPLETE, nCode);
+            }
+        }
+    }
+    p->pThis->Fire(EVENT_DOWNLOAD_ALL_COMPLETE);
+    delete p->pvecSelectName;
     delete p;
     return 0;
+}
+
+bool CDriveControl::GetFolder(TSTRING& folderpath, const TCHAR* szCaption, HWND hOwner) {
+    bool retVal = false;
+    BROWSEINFO bi;
+    memset(&bi, 0, sizeof(bi));
+    bi.ulFlags   = BIF_USENEWUI;
+    bi.hwndOwner = hOwner;
+    bi.lpszTitle = szCaption;
+    ::OleInitialize(NULL);
+    LPITEMIDLIST pIDL = ::SHBrowseForFolder(&bi);
+    if(pIDL != NULL)
+    {
+        TCHAR buffer[_MAX_PATH] = {'\0'};
+        if(::SHGetPathFromIDList(pIDL, buffer) != 0)
+        {
+            folderpath = buffer;
+            retVal = true;
+        }
+        CoTaskMemFree(pIDL);
+    }
+    ::OleUninitialize();
+    return retVal;
 }
 
 void CDriveControl::Event(const TSTRING& strEvent,long nParam) {

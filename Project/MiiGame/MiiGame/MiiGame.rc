@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Taiwan) resources
+// 中文 (台灣) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
 #ifdef _WIN32
@@ -103,6 +103,16 @@ BEGIN
     GROUPBOX        "WBFS",IDC_STATIC,7,7,239,261
     GROUPBOX        "HD",IDC_STATIC,277,7,239,261
     CONTROL         "",IDC_PROGRESS1,"msctls_progress32",PBS_SMOOTH | PBS_VERTICAL,252,86,18,154
+    PUSHBUTTON      "Button2",IDC_BUTTON2,283,247,50,14
+END
+
+IDD_PROG_DLG DIALOGEX 0, 0, 316, 183
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "確定",IDOK,205,162,50,14
+    PUSHBUTTON      "取消",IDCANCEL,259,162,50,14
 END
 
 
@@ -179,6 +189,14 @@ BEGIN
         HORZGUIDE, 240
         HORZGUIDE, 261
     END
+
+    IDD_PROG_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 176
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -193,7 +211,7 @@ BEGIN
     IDS_ABOUTBOX            "&About MiiGame..."
 END
 
-#endif    // Chinese (Taiwan) resources
+#endif    // 中文 (台灣) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -58,8 +58,13 @@ CMiiGameDlg::CMiiGameDlg(CWnd* pParent /*=NULL*/)
     pCMiiGameDlg = this;
     m_driveControl.Register(this, EVENT_UPLOAD_COMPLETE);
     m_driveControl.Register(this, EVENT_UPLOAD_PROGRESS);
+    m_driveControl.Register(this, EVENT_UPLOAD_ALL_COMPLETE);
+    m_driveControl.Register(this, EVENT_UPLOAD_FAILED);
+
     m_driveControl.Register(this, EVENT_DOWNLOAD_COMPLETE);
     m_driveControl.Register(this, EVENT_DOWNLOAD_PROGRESS);
+    m_driveControl.Register(this, EVENT_DOWNLOAD_ALL_COMPLETE);
+    m_driveControl.Register(this, EVENT_DOWNLOAD_FAILED);
 }
 
 void CMiiGameDlg::DoDataExchange(CDataExchange* pDX)
@@ -85,6 +90,7 @@ BEGIN_MESSAGE_MAP(CMiiGameDlg, CDialog)
     ON_BN_CLICKED(IDC_FORMAT_BTN, &CMiiGameDlg::OnBnClickedFormatBtn)
     ON_BN_CLICKED(IDC_DELETE_BTN, &CMiiGameDlg::OnBnClickedDeleteBtn)
     ON_BN_CLICKED(IDC_DELETE_BTN2, &CMiiGameDlg::OnBnClickedDeleteBtn2)
+    ON_BN_CLICKED(IDC_BUTTON2, &CMiiGameDlg::OnBnClickedButton2)
 END_MESSAGE_MAP()
 
 
@@ -179,12 +185,20 @@ void CMiiGameDlg::Event(const TSTRING& strEvent,long nParam) {
         m_progress.UpdateWindow();
     } else if(strEvent == EVENT_DOWNLOAD_COMPLETE) {
         OnDownloadComplete(nParam);
-
     } else if(strEvent == EVENT_DOWNLOAD_PROGRESS) {
         int nStatus = nParam >> 16, nTotal = nParam & 0xFFFF;
         int nPercentage = (int) (((float)nStatus) / ((float)nTotal) * 100);
         m_progress.SetPos(nPercentage);
         m_progress.UpdateWindow();
+    } else if(strEvent == EVENT_UPLOAD_ALL_COMPLETE) {
+        CloseDrive();
+        OnBnClickedLoadBtn();
+    } else if(strEvent == EVENT_DOWNLOAD_ALL_COMPLETE) {
+        CloseDrive();
+    } else if(strEvent == EVENT_UPLOAD_FAILED) {
+        CloseDrive();
+    } else if(strEvent == EVENT_DOWNLOAD_FAILED) {
+        CloseDrive();
     }
 }
 
@@ -331,25 +345,26 @@ void CMiiGameDlg::MB2W(const CStringA& a, CString& b) {
 void CMiiGameDlg::OnBnClickedMoveLeftBtn()
 {
     // Add disk to drive (from your HD to WBFS)
-    vector<CString> vecSelectName;
+    vector<CString>* pvecSelectName = new vector<CString>();
     POSITION pos = m_isoList.GetFirstSelectedItemPosition();
     if(pos == NULL) return;
     while(pos != NULL) {
         int nItem = m_isoList.GetNextSelectedItem(pos);
         CString strItemText = m_isoList.GetItemText(nItem, 0);
-        vecSelectName.push_back(strItemText);
+        pvecSelectName->push_back(strItemText);
     }
     if(this->OpenDrive() != true) return;
-    for(int i = 0; i < vecSelectName.size(); ++i) {
-        CStringA strSelectedName;
-        W2MB(vecSelectName.at(i), strSelectedName);
-        for(int j = 0; j < m_vecISOEntries.size(); ++j) {
-            if(m_vecISOEntries.at(j).m_strDiskName == strSelectedName) {
-                char szNewName[512] = {0};
-                int nCode = m_driveControl.UploadImageToWBFS((char*)m_vecISOEntries.at(j).m_strImagePath.GetString(), ONLY_GAME_PARTITION, false, szNewName);
-            }
-        }
-    }
+    m_driveControl.UploadImageToWBFS(pvecSelectName, m_vecISOEntries);
+    //for(int i = 0; i < vecSelectName.size(); ++i) {
+    //    CStringA strSelectedName;
+    //    W2MB(vecSelectName.at(i), strSelectedName);
+    //    for(int j = 0; j < m_vecISOEntries.size(); ++j) {
+    //        if(m_vecISOEntries.at(j).m_strDiskName == strSelectedName) {
+    //            char szNewName[512] = {0};
+    //            int nCode = m_driveControl.UploadImageToWBFS((char*)m_vecISOEntries.at(j).m_strImagePath.GetString(), ONLY_GAME_PARTITION, false, szNewName);
+    //        }
+    //    }
+    //}
 }
 
 static void __stdcall ExtractProcess(int status, int total) {
@@ -361,30 +376,17 @@ static void __stdcall ExtractProcess(int status, int total) {
 
 void CMiiGameDlg::OnBnClickedMoveRightBtn()
 {
-    if(!this->OpenDrive()) return;
-    vector<CString> vecSelectName;
+    vector<CString>* pvecSelectName = new vector<CString>();
     POSITION pos = m_diskList.GetFirstSelectedItemPosition();
     if(pos == NULL) return;
     while(pos != NULL) {
         int nItem = m_diskList.GetNextSelectedItem(pos);
         CString strItemText = m_diskList.GetItemText(nItem, 0);
-        vecSelectName.push_back(strItemText);
+        pvecSelectName->push_back(strItemText);
     }
 
-    for(int i = 0; i < vecSelectName.size(); ++i) {
-        CStringA strSelectedName;
-        W2MB(vecSelectName.at(i), strSelectedName);
-        for(int j = 0; j < m_vecDiskEntries.size(); ++j) {
-            if(m_vecDiskEntries.at(j).m_strDiskName == strSelectedName) {
-                TSTRING strPath;
-                GetFolder(strPath, _T("Mii Game Manager"));
-                strPath += _T("\\") + TSTRING(vecSelectName.at(i)) + _T(".iso");
-                CStringA straNewName;
-                W2MB(strPath.c_str(), straNewName);
-                m_driveControl.ExtractDiskToHD((char*)m_vecDiskEntries.at(j).m_strDiskID.GetString(), straNewName);
-            }
-        }
-    }
+    if(!this->OpenDrive()) return;
+    m_driveControl.ExtractDiskToHD(pvecSelectName, m_vecDiskEntries);
 }
 
 void CMiiGameDlg::OnBnClickedFormatBtn()
@@ -475,8 +477,6 @@ void CMiiGameDlg::OnEventUploadComplete( long nParam )
             break;
     }
     m_progress.SetPos(0);
-    CloseDrive();
-    OnBnClickedLoadBtn();
     AfxMessageBox(strMsg, nParam == 0 ? MB_ICONWARNING | MB_OK : MB_OK);
 }
 
@@ -498,29 +498,11 @@ void CMiiGameDlg::OnDownloadComplete(long nParam)
         break;
     }
     m_progress.SetPos(0);
-    CloseDrive();
     AfxMessageBox(strMsg, nParam == 0 ? MB_ICONWARNING | MB_OK : MB_OK);
 }
 
-bool CMiiGameDlg::GetFolder(TSTRING& folderpath, const TCHAR* szCaption, HWND hOwner) {
-    bool retVal = false;
-    BROWSEINFO bi;
-    memset(&bi, 0, sizeof(bi));
-    bi.ulFlags   = BIF_USENEWUI;
-    bi.hwndOwner = hOwner;
-    bi.lpszTitle = szCaption;
-    ::OleInitialize(NULL);
-    LPITEMIDLIST pIDL = ::SHBrowseForFolder(&bi);
-    if(pIDL != NULL)
-    {
-        TCHAR buffer[_MAX_PATH] = {'\0'};
-        if(::SHGetPathFromIDList(pIDL, buffer) != 0)
-        {
-            folderpath = buffer;
-            retVal = true;
-        }
-        CoTaskMemFree(pIDL);
-    }
-    ::OleUninitialize();
-    return retVal;
+void CMiiGameDlg::OnBnClickedButton2()
+{
+#include "ProgressDlg.h"
+    CProgressDlg pd;
 }

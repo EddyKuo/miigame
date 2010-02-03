@@ -3,9 +3,14 @@
 #include "ImageEntry.h"
 #include "NotifyBase.h"
 
+static TSTRING EVENT_UPLOAD_ALL_COMPLETE = _T("Upload All Complete");
 static TSTRING EVENT_UPLOAD_COMPLETE = _T("Upload Complete");
+static TSTRING EVENT_UPLOAD_FAILED = _T("Upload Failed");
 static TSTRING EVENT_UPLOAD_PROGRESS = _T("Upload Progress");
+
+static TSTRING EVENT_DOWNLOAD_ALL_COMPLETE = _T("Download All Complete");
 static TSTRING EVENT_DOWNLOAD_COMPLETE = _T("Download Complete");
+static TSTRING EVENT_DOWNLOAD_FAILED = _T("Download Failed");
 static TSTRING EVENT_DOWNLOAD_PROGRESS = _T("Download Progress");
 
 using namespace std;
@@ -21,12 +26,16 @@ public:
     bool OpenDrive(CStringA strDriveLetter);
     vector<CImageEntry> GetDiskFromDrive(CStringA strDriveLetter);
     CImageEntry GetImageFromHD(CString& strFilePath);
-    int UploadImageToWBFS(CStringA strImagePath, partition_selector_t selector, bool copy1to1, char *newName);
+
+    // used for upload image
+    int UploadImageToWBFS(vector<CString>* pvecSelectName, vector<CImageEntry>& vecImage);
     static UINT UploadThread(LPVOID nParam);
 
-    int ExtractDiskToHD(CStringA strGameID, CStringA newFileName);
+    // used for download image
+    int ExtractDiskToHD(vector<CString>* pvecSelectName, vector<CImageEntry>& vecImage);
     static UINT ExtractThread(LPVOID nParam);
 
+    bool GetFolder(TSTRING& folderpath, const TCHAR* szCaption = NULL, HWND hOwner = NULL);
     void Event(const TSTRING& strEvent,long nParam);
 public:
     vector<CString> m_vecDrivers;
