@@ -7,13 +7,14 @@
 #include "DriveControl.h"
 #include "ImageEntry.h"
 #include "EntryListCtrl.h"
-
+#include "NotifyBase.h"
+#include "../Localization/Localization.h"
 #include <vector>
 #include <map>
 
 using namespace std;
 // CMiiGameDlg dialog
-class CMiiGameDlg : public CDialog
+class CMiiGameDlg : public CDialog, public CINotifyBase
 {
     // Construction
 public:
@@ -28,6 +29,8 @@ public:
     static void W2MB(const CString& a, CStringA& b);
     static void MB2W(const CStringA& a, CString& b);
     static void Progress(int status, int total);
+    void Event(const TSTRING& strEvent,long nParam);
+    
 private:
     map<int, CString> m_errorMSg;
     CDriveControl m_driveControl;
@@ -37,13 +40,16 @@ private:
     CEntryListCtrl m_isoList;
     CComboBox m_driveCombo;
     CComboBox m_folderDropList;
+    CLocalization m_localization;
+    CProgressCtrl m_progress;
+
 private:
     bool OpenDrive();
     void GetDisks();
     void SetInformationToList();
     void SetImageListContent(bool bCleanOriginalList);
     void InitListCcontrol();
-    //static UINT UploadImageThread(LPVOID pParam);
+    void OnEventUploadComplete( long nParam );
     // Implementation
 protected:
     HICON m_hIcon;
@@ -61,6 +67,5 @@ protected:
     afx_msg void OnBnClickedMoveRightBtn();
     afx_msg void OnBnClickedFormatBtn();
     afx_msg void OnBnClickedDeleteBtn();
-public:
     afx_msg void OnBnClickedDeleteBtn2();
 };

@@ -13,6 +13,8 @@
 
 // CAboutDlg dialog used for App About
 
+TCHAR* szTitle = _T("Mii Game for your games");
+
 class CAboutDlg : public CDialog
 {
 public:
@@ -44,13 +46,15 @@ END_MESSAGE_MAP()
 
 // CMiiGameDlg dialog
 
-
-
+static CMiiGameDlg* pCMiiGameDlg = NULL;
 
 CMiiGameDlg::CMiiGameDlg(CWnd* pParent /*=NULL*/)
 : CDialog(CMiiGameDlg::IDD, pParent)
 {
     m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+    pCMiiGameDlg = this;
+    m_driveControl.Register(this, EVENT_UPLOAD_COMPLETE);
+    m_driveControl.Register(this, EVENT_UPLOAD_PROGRESS);
 }
 
 void CMiiGameDlg::DoDataExchange(CDataExchange* pDX)
@@ -60,6 +64,7 @@ void CMiiGameDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_LIST3, m_diskList);
     DDX_Control(pDX, IDC_LIST4, m_isoList);
     DDX_Control(pDX, IDC_FOLDER_COMBO, m_folderDropList);
+    DDX_Control(pDX, IDC_PROGRESS1, m_progress);
 }
 
 BEGIN_MESSAGE_MAP(CMiiGameDlg, CDialog)
@@ -83,7 +88,7 @@ END_MESSAGE_MAP()
 BOOL CMiiGameDlg::OnInitDialog()
 {
     CDialog::OnInitDialog();
-
+    SetWindowText(szTitle);
     // Add "About..." menu item to system menu.
 
     // IDM_ABOUTBOX must be in the system command range.
@@ -159,6 +164,17 @@ HCURSOR CMiiGameDlg::OnQueryDragIcon()
     return static_cast<HCURSOR>(m_hIcon);
 }
 
+void CMiiGameDlg::Event(const TSTRING& strEvent,long nParam) {
+    if(strEvent == EVENT_UPLOAD_COMPLETE) {
+        OnEventUploadComplete(nParam);
+    } else if(strEvent == EVENT_UPLOAD_PROGRESS) {
+        int nStatus = nParam >> 16, nTotal = nParam & 0xFFFF;
+        int nPercentage = (int) (((float)nStatus) / ((float)nTotal) * 100);
+        m_progress.SetPos(nPercentage);
+        m_progress.UpdateWindow();
+    }
+}
+
 void CMiiGameDlg::InitListCcontrol()
 {
     LONG lStyle = GetWindowLong(m_diskList.m_hWnd, GWL_STYLE); // Get the current window style 
@@ -166,14 +182,14 @@ void CMiiGameDlg::InitListCcontrol()
     SetWindowLong(m_diskList.m_hWnd, GWL_STYLE, lStyle); // set style
     SetWindowLong(m_isoList.m_hWnd, GWL_STYLE, lStyle); // set style
 
-    m_diskList.InsertColumn(0, _T("Game Title"), 0, 170);
-    m_diskList.InsertColumn(1, _T("Game ID"), 0, 60);
-    m_diskList.InsertColumn(2, _T("Image Size"), 0, 60);
-    //m_diskList.InsertColumn(3, _T("Region Code"), 0, 50);
+    m_diskList.InsertColumn(0, m_localization.GetIDString(_T("IDS_GAME_TITLE")), 0, 170);
+    m_diskList.InsertColumn(1, m_localization.GetIDString(_T("IDS_GAME_ID")), 0, 60);
+    m_diskList.InsertColumn(2, m_localization.GetIDString(_T("IDS_IMAGE_SIZE")), 0, 60);
+    m_diskList.InsertColumn(3, m_localization.GetIDString(_T("IDS_REGION_CODE")), 0, 50);
     m_diskList.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);    
 
-    m_isoList.InsertColumn(0, _T("Game Title"), 0, 170);
-    m_isoList.InsertColumn(2, _T("Image Size"), 0, 60);
+    m_isoList.InsertColumn(0, m_localization.GetIDString(_T("IDS_GAME_TITLE")), 0, 170);
+    m_isoList.InsertColumn(1, m_localization.GetIDString(_T("IDS_IMAGE_SIZE")), 0, 60);
     m_isoList.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 }
 
@@ -184,6 +200,7 @@ void CMiiGameDlg::OnBnClickedLoadBtn()
     GetDisks();
     SetInformationToList();
     CloseDrive();
+    GetDlgItem(IDC_COMBO2)->EnableWindow(FALSE);
 }
 
 void CMiiGameDlg::OnBnClickedUpdateDriveBtn()
@@ -198,6 +215,7 @@ void CMiiGameDlg::OnBnClickedUpdateDriveBtn()
         m_driveCombo.AddString(m_driveControl.GetDrivers().at(i));
     }
     m_driveCombo.SetCurSel(0);
+    GetDlgItem(IDC_COMBO2)->EnableWindow(TRUE);
 }
 
 bool CMiiGameDlg::OpenDrive()
@@ -276,10 +294,6 @@ void CMiiGameDlg::OnBnClickedOpenFileBtn()
                 m_vecISOEntries.push_back(entry);
         }
         SetImageListContent(true);
-        pos = fd.GetStartPosition();
-        CString strFilePath = fd.GetNextPathName(pos);
-        CString strFolder = strFilePath.Mid(0, strFilePath.ReverseFind('\\'));
-        m_folderDropList.AddString(strFolder);
     }
 }
 
@@ -301,24 +315,6 @@ void CMiiGameDlg::MB2W(const CStringA& a, CString& b) {
     delete [] pwText;
 }
 
-void CMiiGameDlg::Progress(int status, int total) {
-    float fRatio = (float)status / (float)total;
-    CStringA strMsg;
-    strMsg.Format("%.2f\n", fRatio);
-    TRACE(strMsg.GetString());
-}
-
-void __stdcall progress(int status, int total) {
-    CMiiGameDlg::Progress(status, total);
-}
-
-//UINT CMiiGameDlg::UploadImageThread(LPVOID pParam) {
-//	CMiiGameDlg* pThis = (CMiiGameDlg*)pParam;
-//	char szNewName[512] = {0};
-//	pThis->m_driveControl.UploadImageToWBFS((char*)pThis->m_vecISOEntries.at(j).m_strImagePath.GetString(),
-//		(progress_callback_t)progress, ONLY_GAME_PARTITION, false, szNewName);
-//}
-
 void CMiiGameDlg::OnBnClickedMoveLeftBtn()
 {
     // Add disk to drive (from your HD to WBFS)
@@ -337,29 +333,10 @@ void CMiiGameDlg::OnBnClickedMoveLeftBtn()
         for(int j = 0; j < m_vecISOEntries.size(); ++j) {
             if(m_vecISOEntries.at(j).m_strDiskName == strSelectedName) {
                 char szNewName[512] = {0};
-                int nCode = m_driveControl.UploadImageToWBFS((char*)m_vecISOEntries.at(j).m_strImagePath.GetString(), (progress_callback_t)progress, ONLY_GAME_PARTITION, false, szNewName);
-                if(nCode == 0) {
-                    AfxMessageBox(_T("Upload to WBFS successfully..."), MB_OK);
-                } else {
-                    CString strMsg;
-                    switch(nCode) {
-case -1:
-    strMsg = _T("Partition wasn't loaded previously");
-    break;
-case -2:
-    strMsg = _T("Error occured while attempting to read file");
-    break;
-case -3:
-    strMsg = _T("Disc already exists on WBFS drive");
-    break;
-                    }
-                    AfxMessageBox(strMsg, MB_ICONWARNING | MB_OK);
-                }
+                int nCode = m_driveControl.UploadImageToWBFS((char*)m_vecISOEntries.at(j).m_strImagePath.GetString(), ONLY_GAME_PARTITION, false, szNewName);
             }
         }
     }
-    CloseDrive();
-    OnBnClickedLoadBtn();
 }
 
 void CMiiGameDlg::OnBnClickedMoveRightBtn()
@@ -369,7 +346,7 @@ void CMiiGameDlg::OnBnClickedMoveRightBtn()
 
 void CMiiGameDlg::OnBnClickedFormatBtn()
 {
-    int nRet = AfxMessageBox(_T("Are you sure to format this driver?"), MB_YESNO);
+    int nRet = AfxMessageBox(m_localization.GetIDString(_T("IDS_Are_you_sure_to_format_this_driver")), MB_YESNO);
     if(nRet == IDNO) return;
 
     CString strDriveLetter;
@@ -379,7 +356,9 @@ void CMiiGameDlg::OnBnClickedFormatBtn()
     straDriveLetter.Replace(":", "");
     CloseDrive();
     if(!FormatDrive((char*)straDriveLetter.GetString())) {
-        AfxMessageBox(_T("Format failed..."));
+        AfxMessageBox(m_localization.GetIDString(_T("IDS_Format_failed")), MB_ICONWARNING | MB_OK);
+    } else {
+        AfxMessageBox(m_localization.GetIDString(_T("IDS_Format_successfully")), MB_ICONINFORMATION | MB_OK);
     }
     CloseDrive();
     OnBnClickedLoadBtn();
@@ -410,7 +389,6 @@ void CMiiGameDlg::OnBnClickedDeleteBtn()
     OnBnClickedLoadBtn();
 }
 
-
 void CMiiGameDlg::OnBnClickedDeleteBtn2()
 {
     vector<CString> vecSelectName;
@@ -434,4 +412,27 @@ void CMiiGameDlg::OnBnClickedDeleteBtn2()
         }
     }
     SetImageListContent(true);
+}
+
+void CMiiGameDlg::OnEventUploadComplete( long nParam )
+{
+    CString strMsg;
+    switch(nParam) {
+        case 0:
+            strMsg = m_localization.GetIDString(_T("IDS_Upload_to_WBFS_successfully"));
+            break;
+        case -1:
+            strMsg = m_localization.GetIDString(_T("IDS_Partition_wasn't_loaded_previously"));
+            break;
+        case -2:
+            strMsg = m_localization.GetIDString(_T("IDS_Error_occured_while_attempting_to_read_file"));
+            break;
+        case -3:
+            strMsg = m_localization.GetIDString(_T("IDS_Disc_already_exists_on_WBFS_drive"));
+            break;
+    }
+    m_progress.SetPos(0);
+    CloseDrive();
+    OnBnClickedLoadBtn();
+    AfxMessageBox(strMsg, nParam == 0 ? MB_ICONWARNING | MB_OK : MB_OK);
 }

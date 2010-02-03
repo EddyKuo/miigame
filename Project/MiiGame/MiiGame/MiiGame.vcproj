@@ -251,6 +251,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NotifyBase.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Resource.h"
 				>
 			</File>

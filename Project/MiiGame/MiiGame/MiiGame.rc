@@ -82,24 +82,27 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
 END
 
-IDD_MIIGAME_DIALOG DIALOGEX 0, 0, 526, 269
+IDD_MIIGAME_DIALOG DIALOGEX 0, 0, 523, 276
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "MiiGame"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    COMBOBOX        IDC_COMBO2,6,6,107,108,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Load",IDC_LOAD_BTN,127,7,50,14
-    PUSHBUTTON      "Update Drives",IDC_UPDATE_DRIVE_BTN,187,7,59,14
-    CONTROL         "",IDC_LIST3,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,6,24,240,216
-    PUSHBUTTON      "Delete",IDC_DELETE_BTN,192,246,50,14
-    CONTROL         "",IDC_LIST4,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,276,24,240,216
-    PUSHBUTTON      "Open Files",IDC_OPEN_FILE_BTN,466,7,50,14
+    COMBOBOX        IDC_COMBO2,14,17,107,108,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Load",IDC_LOAD_BTN,125,17,50,14
+    PUSHBUTTON      "Update Drives",IDC_UPDATE_DRIVE_BTN,180,17,59,14
+    CONTROL         "",IDC_LIST3,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,14,37,225,203
+    PUSHBUTTON      "Delete",IDC_DELETE_BTN,70,247,50,14
+    CONTROL         "",IDC_LIST4,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,283,37,227,203
+    PUSHBUTTON      "Open Files",IDC_OPEN_FILE_BTN,467,17,43,14
     PUSHBUTTON      "<=",IDC_MOVE_LEFT_BTN,252,48,18,14
     PUSHBUTTON      "=>",IDC_MOVE_RIGHT_BTN,252,66,18,14
-    PUSHBUTTON      "Delete",IDC_DELETE_BTN2,462,246,50,14
-    COMBOBOX        IDC_FOLDER_COMBO,276,7,187,163,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Format",IDC_FORMAT_BTN,6,246,50,14
+    PUSHBUTTON      "Delete",IDC_DELETE_BTN2,460,247,50,14
+    COMBOBOX        IDC_FOLDER_COMBO,283,17,176,163,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Format",IDC_FORMAT_BTN,14,247,50,14
+    GROUPBOX        "WBFS",IDC_STATIC,7,7,239,261
+    GROUPBOX        "HD",IDC_STATIC,277,7,239,261
+    CONTROL         "",IDC_PROGRESS1,"msctls_progress32",PBS_SMOOTH | PBS_VERTICAL,252,86,18,181
 END
 
 
@@ -125,13 +128,10 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "TODO: <Company name>"
-            VALUE "FileDescription", "TODO: <File description>"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "MiiGame.exe"
-            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
             VALUE "OriginalFilename", "MiiGame.exe"
-            VALUE "ProductName", "TODO: <Product name>"
+            VALUE "ProductName", "Mii Game Manager"
             VALUE "ProductVersion", "1.0.0.1"
         END
     END
@@ -161,16 +161,23 @@ BEGIN
     IDD_MIIGAME_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 519
+        RIGHTMARGIN, 516
+        VERTGUIDE, 14
+        VERTGUIDE, 239
         VERTGUIDE, 246
+        VERTGUIDE, 252
+        VERTGUIDE, 270
         VERTGUIDE, 276
+        VERTGUIDE, 283
+        VERTGUIDE, 510
         VERTGUIDE, 516
         TOPMARGIN, 7
-        BOTTOMMARGIN, 262
+        BOTTOMMARGIN, 269
         HORZGUIDE, 7
-        HORZGUIDE, 20
-        HORZGUIDE, 24
+        HORZGUIDE, 17
+        HORZGUIDE, 37
         HORZGUIDE, 240
+        HORZGUIDE, 261
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -188,6 +195,8 @@ END
 
 #endif    // Chinese (Taiwan) resources
 /////////////////////////////////////////////////////////////////////////////
+
+
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
