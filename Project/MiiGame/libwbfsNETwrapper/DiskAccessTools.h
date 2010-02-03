@@ -10,7 +10,7 @@
 #include <fcntl.h>
 
 #include "CSWtools.h"
-#include "libwbfs_os.h"
+#include "../libwbfs/include/libwbfs_os.h"
 int __stdcall read_wii_disc_sector(void *_handle, unsigned int _offset, unsigned int count, void *buf);
 int __stdcall write_wii_disc_sector(void *_handle, unsigned int lba, unsigned int count, void *buf);
 HANDLE* CreateFileHP(
