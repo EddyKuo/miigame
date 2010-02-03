@@ -4,6 +4,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiiGame", "MiiGame\MiiGame.vcproj", "{8212F5D5-C28E-4944-B5AF-87AA71E79931}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C80EA20B-021F-4CEF-9C1D-472EFA7254DB} = {C80EA20B-021F-4CEF-9C1D-472EFA7254DB}
+		{95A5D091-30C3-46AA-8C09-8D1411CC730D} = {95A5D091-30C3-46AA-8C09-8D1411CC730D}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libwbfsNETwrapper", "libwbfsNETwrapper\libwbfsNETwrapper.vcproj", "{C80EA20B-021F-4CEF-9C1D-472EFA7254DB}"
