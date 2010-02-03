@@ -9,6 +9,8 @@ CDriveControl::CDriveControl()
     UpdateDrivers();
     DefineNotify(EVENT_UPLOAD_COMPLETE);
     DefineNotify(EVENT_UPLOAD_PROGRESS);
+    DefineNotify(EVENT_DOWNLOAD_COMPLETE);
+    DefineNotify(EVENT_DOWNLOAD_PROGRESS);
     g_pThis = this;
 }
 
@@ -95,16 +97,16 @@ typedef struct upload_param {
     char *newName;
 } UL_Param;
 
-void __stdcall progress(int status, int total) {
+void __stdcall UploadProgress(int status, int total) {
     long nParam = (status << 16) | total;
     g_pThis->Fire(EVENT_UPLOAD_PROGRESS, nParam);
 }
 
-int CDriveControl::UploadImageToWBFS(char* strImagePath, partition_selector_t selector, bool copy1to1, char *newName) {
+int CDriveControl::UploadImageToWBFS(CStringA strImagePath, partition_selector_t selector, bool copy1to1, char *newName) {
     UL_Param *p = new UL_Param;
     p->pThis = this;
     p->strImagePath = strImagePath;
-    p->pFnCallback = progress;
+    p->pFnCallback = UploadProgress;
     p->selector = selector;
     p->copy1to1 = copy1to1;
     p->newName = NULL;
@@ -116,7 +118,36 @@ UINT CDriveControl::UploadThread(LPVOID nParam) {
     UL_Param *p = (UL_Param*)nParam;
     char szNewName[512] = {0};
     int nCode = AddDiscToDrive((char*)p->strImagePath.GetString(), p->pFnCallback, p->selector, false, szNewName);
-    p->pThis->Fire(EVENT_UPLOAD_COMPLETE);
+    p->pThis->Fire(EVENT_UPLOAD_COMPLETE, nCode);
+    delete p;
+    return 0;
+}
+
+
+typedef struct download_param {
+    CDriveControl* pThis;
+    CStringA strDiskID;
+    CStringA strSaveTo;
+} DL_Param;
+
+void __stdcall DownloadProgress(int status, int total) {
+    long nParam = (status << 16) | total;
+    g_pThis->Fire(EVENT_DOWNLOAD_PROGRESS, nParam);
+}
+
+int CDriveControl::ExtractDiskToHD(CStringA strGameID, CStringA newFileName) {
+    DL_Param* p = new DL_Param;
+    p->pThis = this;
+    p->strDiskID = strGameID;
+    p->strSaveTo = newFileName;
+    CWinThread* thread = AfxBeginThread(CDriveControl::ExtractThread, p);
+    return 0;
+}
+
+UINT CDriveControl::ExtractThread(LPVOID nParam) {
+    DL_Param* p = (DL_Param*)nParam;
+    int nCode = ExtractDiscFromDrive((char*)p->strDiskID.GetString(), DownloadProgress, (char*)p->strSaveTo.GetString());
+    p->pThis->Fire(EVENT_DOWNLOAD_COMPLETE, nCode);
     delete p;
     return 0;
 }

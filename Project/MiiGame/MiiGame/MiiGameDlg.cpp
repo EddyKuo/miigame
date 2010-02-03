@@ -5,6 +5,9 @@
 #include "MiiGame.h"
 #include "MiiGameDlg.h"
 #include "../libwbfsNETwrapper/WbfsInterm.h"
+#include "shlobj.h"
+#include <string>
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -55,6 +58,8 @@ CMiiGameDlg::CMiiGameDlg(CWnd* pParent /*=NULL*/)
     pCMiiGameDlg = this;
     m_driveControl.Register(this, EVENT_UPLOAD_COMPLETE);
     m_driveControl.Register(this, EVENT_UPLOAD_PROGRESS);
+    m_driveControl.Register(this, EVENT_DOWNLOAD_COMPLETE);
+    m_driveControl.Register(this, EVENT_DOWNLOAD_PROGRESS);
 }
 
 void CMiiGameDlg::DoDataExchange(CDataExchange* pDX)
@@ -168,6 +173,14 @@ void CMiiGameDlg::Event(const TSTRING& strEvent,long nParam) {
     if(strEvent == EVENT_UPLOAD_COMPLETE) {
         OnEventUploadComplete(nParam);
     } else if(strEvent == EVENT_UPLOAD_PROGRESS) {
+        int nStatus = nParam >> 16, nTotal = nParam & 0xFFFF;
+        int nPercentage = (int) (((float)nStatus) / ((float)nTotal) * 100);
+        m_progress.SetPos(nPercentage);
+        m_progress.UpdateWindow();
+    } else if(strEvent == EVENT_DOWNLOAD_COMPLETE) {
+        OnDownloadComplete(nParam);
+
+    } else if(strEvent == EVENT_DOWNLOAD_PROGRESS) {
         int nStatus = nParam >> 16, nTotal = nParam & 0xFFFF;
         int nPercentage = (int) (((float)nStatus) / ((float)nTotal) * 100);
         m_progress.SetPos(nPercentage);
@@ -339,9 +352,39 @@ void CMiiGameDlg::OnBnClickedMoveLeftBtn()
     }
 }
 
+static void __stdcall ExtractProcess(int status, int total) {
+    float nPercentage = (float)status / (float)total;
+    CString strMsg;
+    strMsg.Format(_T("%.2f\n"), nPercentage);
+    TRACE(strMsg.GetString());
+}
+
 void CMiiGameDlg::OnBnClickedMoveRightBtn()
 {
-    // TODO: Add your control notification handler code here
+    if(!this->OpenDrive()) return;
+    vector<CString> vecSelectName;
+    POSITION pos = m_diskList.GetFirstSelectedItemPosition();
+    if(pos == NULL) return;
+    while(pos != NULL) {
+        int nItem = m_diskList.GetNextSelectedItem(pos);
+        CString strItemText = m_diskList.GetItemText(nItem, 0);
+        vecSelectName.push_back(strItemText);
+    }
+
+    for(int i = 0; i < vecSelectName.size(); ++i) {
+        CStringA strSelectedName;
+        W2MB(vecSelectName.at(i), strSelectedName);
+        for(int j = 0; j < m_vecDiskEntries.size(); ++j) {
+            if(m_vecDiskEntries.at(j).m_strDiskName == strSelectedName) {
+                TSTRING strPath;
+                GetFolder(strPath, _T("Mii Game Manager"));
+                strPath += _T("\\") + TSTRING(vecSelectName.at(i)) + _T(".iso");
+                CStringA straNewName;
+                W2MB(strPath.c_str(), straNewName);
+                m_driveControl.ExtractDiskToHD((char*)m_vecDiskEntries.at(j).m_strDiskID.GetString(), straNewName);
+            }
+        }
+    }
 }
 
 void CMiiGameDlg::OnBnClickedFormatBtn()
@@ -435,4 +478,49 @@ void CMiiGameDlg::OnEventUploadComplete( long nParam )
     CloseDrive();
     OnBnClickedLoadBtn();
     AfxMessageBox(strMsg, nParam == 0 ? MB_ICONWARNING | MB_OK : MB_OK);
+}
+
+void CMiiGameDlg::OnDownloadComplete(long nParam)
+{
+    CString strMsg;
+    switch(nParam) {
+    case 0:
+        strMsg = m_localization.GetIDString(_T("IDS_Download_successfully"));
+        break;
+    case -1:
+        strMsg = m_localization.GetIDString(_T("IDS_Partition_wasn't_loaded_previously"));
+        break;
+    case -2:
+        strMsg = m_localization.GetIDString(_T("IDS_File_could_not_be_found_on_WBFS_drive"));
+        break;
+    case -3:
+        strMsg = m_localization.GetIDString(_T("IDS_Unable_to_open_file_on_disk_for_writing"));
+        break;
+    }
+    m_progress.SetPos(0);
+    CloseDrive();
+    AfxMessageBox(strMsg, nParam == 0 ? MB_ICONWARNING | MB_OK : MB_OK);
+}
+
+bool CMiiGameDlg::GetFolder(TSTRING& folderpath, const TCHAR* szCaption, HWND hOwner) {
+    bool retVal = false;
+    BROWSEINFO bi;
+    memset(&bi, 0, sizeof(bi));
+    bi.ulFlags   = BIF_USENEWUI;
+    bi.hwndOwner = hOwner;
+    bi.lpszTitle = szCaption;
+    ::OleInitialize(NULL);
+    LPITEMIDLIST pIDL = ::SHBrowseForFolder(&bi);
+    if(pIDL != NULL)
+    {
+        TCHAR buffer[_MAX_PATH] = {'\0'};
+        if(::SHGetPathFromIDList(pIDL, buffer) != 0)
+        {
+            folderpath = buffer;
+            retVal = true;
+        }
+        CoTaskMemFree(pIDL);
+    }
+    ::OleUninitialize();
+    return retVal;
 }

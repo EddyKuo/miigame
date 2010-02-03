@@ -30,7 +30,7 @@ public:
     static void MB2W(const CStringA& a, CString& b);
     static void Progress(int status, int total);
     void Event(const TSTRING& strEvent,long nParam);
-    
+
 private:
     map<int, CString> m_errorMSg;
     CDriveControl m_driveControl;
@@ -49,7 +49,11 @@ private:
     void SetInformationToList();
     void SetImageListContent(bool bCleanOriginalList);
     void InitListCcontrol();
-    void OnEventUploadComplete( long nParam );
+    void OnEventUploadComplete(long nParam);
+    void OnDownloadComplete(long nParam);
+    void UpdateUIString(LCID lcid);
+    bool GetFolder(TSTRING& folderpath, const TCHAR* szCaption = NULL, HWND hOwner = NULL);
+
     // Implementation
 protected:
     HICON m_hIcon;
