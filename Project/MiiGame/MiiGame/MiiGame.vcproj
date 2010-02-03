@@ -134,6 +134,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4018;4200"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
