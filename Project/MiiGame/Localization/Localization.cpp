@@ -44,6 +44,7 @@ CLocalization::CLocalization() : m_currentLCID(GetThreadLocale()) {
     FindLanguageFile();
     m_strLCID.Format(_T("0x%.4X"), m_currentLCID);
 }
+
 CLocalization::~CLocalization() {
 
 }
