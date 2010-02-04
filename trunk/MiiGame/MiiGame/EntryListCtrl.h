@@ -1,15 +1,19 @@
 #pragma once
 
-
+#include "NotifyBase.h"
 // CEntryListCtrl
 
-class CEntryListCtrl : public CListCtrl
+static TSTRING EVENT_ZERO_LENGTH_EDITION = _T("Zero Length");
+static TSTRING EVENT_CHANGE_DISK_NAME = _T("Change Name");
+
+class CEntryListCtrl : public CListCtrl, public CINotifyBase
 {
     DECLARE_DYNAMIC(CEntryListCtrl)
 
 public:
     CEntryListCtrl();
     virtual ~CEntryListCtrl();
+    virtual void Event(const TSTRING& strEvent,long nParam);
 private:
     UINT GetSelectedItem();
 protected:

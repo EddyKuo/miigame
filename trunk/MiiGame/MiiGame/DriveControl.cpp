@@ -134,18 +134,19 @@ int CDriveControl::UploadImageToWBFS(vector<CString>* pvecSelectName, vector<CIm
 UINT CDriveControl::UploadThread(LPVOID nParam) {
     UL_Param *p = (UL_Param*)nParam;
     char szNewName[512] = {0};
+    int nCode = 0;
     for(int i = 0; i < p->pvecSelectName->size(); ++i) {
         CStringA strSelectedName;
         W2MB(p->pvecSelectName->at(i), strSelectedName);
         for(int j = 0; j < p->pvecImage->size(); ++j) {
             if(p->pvecImage->at(j).m_strDiskName == strSelectedName) {
                 char szNewName[512] = {0};
-                int nCode = AddDiscToDrive((char*)p->pvecImage->at(j).m_strImagePath.GetString(), UploadProgress, ONLY_GAME_PARTITION, false, szNewName);
+                nCode = AddDiscToDrive((char*)p->pvecImage->at(j).m_strImagePath.GetString(), UploadProgress, ONLY_GAME_PARTITION, false, szNewName);
                 p->pThis->Fire(EVENT_UPLOAD_COMPLETE, nCode);
             }
         }
     }
-    p->pThis->Fire(EVENT_UPLOAD_ALL_COMPLETE);
+    p->pThis->Fire(EVENT_UPLOAD_ALL_COMPLETE, nCode);
     delete p->pvecSelectName;
     delete p;
     return 0;
@@ -183,6 +184,7 @@ UINT CDriveControl::ExtractThread(LPVOID nParam) {
         delete p;
         return 0;
     }
+    int nCode = 0;
     for(int i = 0; i < p->pvecSelectName->size(); ++i) {
         CStringA strSelectedName;
         W2MB(p->pvecSelectName->at(i), strSelectedName);
@@ -191,12 +193,12 @@ UINT CDriveControl::ExtractThread(LPVOID nParam) {
                 TSTRING strISOLocation = strPath + _T("\\") + TSTRING(p->pvecSelectName->at(i)) + _T(".iso");
                 CStringA straNewName;
                 W2MB(strISOLocation.c_str(), straNewName);
-                int nCode = ExtractDiscFromDrive((char*)p->pvecImage->at(j).m_strDiskID.GetString(), DownloadProgress, (char*)straNewName.GetString());
+                nCode = ExtractDiscFromDrive((char*)p->pvecImage->at(j).m_strDiskID.GetString(), DownloadProgress, (char*)straNewName.GetString());
                 p->pThis->Fire(EVENT_DOWNLOAD_COMPLETE, nCode);
             }
         }
     }
-    p->pThis->Fire(EVENT_DOWNLOAD_ALL_COMPLETE);
+    p->pThis->Fire(EVENT_DOWNLOAD_ALL_COMPLETE, nCode);
     delete p->pvecSelectName;
     delete p;
     return 0;
