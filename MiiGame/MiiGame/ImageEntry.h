@@ -11,6 +11,7 @@ public:
     CStringA m_strDiskID;       // Disk ID 6 codes
     float m_fDiskSize;          // disk size
     RegionCode m_regionCode;    // region code
+    CString m_strRegionCode;    // region code in string
 
     CImageEntry(CStringA strDiskName, CStringA strDiskID, float fDiskSize, RegionCode regionCode, CStringA strImagePath = "")
     {
