@@ -65,6 +65,9 @@ CMiiGameDlg::CMiiGameDlg(CWnd* pParent /*=NULL*/)
     m_driveControl.Register(this, EVENT_DOWNLOAD_PROGRESS);
     m_driveControl.Register(this, EVENT_DOWNLOAD_ALL_COMPLETE);
     m_driveControl.Register(this, EVENT_DOWNLOAD_FAILED);
+
+    m_isoList.Register(this, EVENT_ZERO_LENGTH_EDITION);
+    m_diskList.Register(this, EVENT_CHANGE_DISK_NAME);
 }
 
 void CMiiGameDlg::DoDataExchange(CDataExchange* pDX)
@@ -206,14 +209,21 @@ void CMiiGameDlg::Event(const TSTRING& strEvent,long nParam) {
         m_progress.SetPos(nPercentage);
         m_progress.UpdateWindow();
     } else if(strEvent == EVENT_UPLOAD_ALL_COMPLETE) {
+        AfxMessageBox(m_localization.GetIDString(_T("IDS_Upload_to_WBFS_successfully")), MB_OK);
         CloseDrive();
         OnBnClickedLoadBtn();
     } else if(strEvent == EVENT_DOWNLOAD_ALL_COMPLETE) {
+        AfxMessageBox(m_localization.GetIDString(_T("IDS_Download_successfully")), MB_OK);
         CloseDrive();
     } else if(strEvent == EVENT_UPLOAD_FAILED) {
         CloseDrive();
     } else if(strEvent == EVENT_DOWNLOAD_FAILED) {
         CloseDrive();
+    } else if(strEvent == EVENT_ZERO_LENGTH_EDITION) {
+        SetImageListContent(true);
+    } else if(strEvent == EVENT_CHANGE_DISK_NAME) {
+        RenameDisk(nParam);
+
     }
 }
 
@@ -222,6 +232,7 @@ void CMiiGameDlg::InitListCcontrol()
     LONG lStyle = GetWindowLong(m_diskList.m_hWnd, GWL_STYLE); // Get the current window style 
     lStyle |= LVS_EDITLABELS | LVS_SHOWSELALWAYS; // set style 
     SetWindowLong(m_diskList.m_hWnd, GWL_STYLE, lStyle); // set style
+    lStyle &= ~LVS_EDITLABELS;
     SetWindowLong(m_isoList.m_hWnd, GWL_STYLE, lStyle); // set style
 
     m_diskList.InsertColumn(0, m_localization.GetIDString(_T("IDS_GAME_TITLE")), 0, 170);
@@ -384,16 +395,6 @@ void CMiiGameDlg::OnBnClickedMoveLeftBtn()
     }
     if(this->OpenDrive() != true) return;
     m_driveControl.UploadImageToWBFS(pvecSelectName, m_vecISOEntries);
-    //for(int i = 0; i < vecSelectName.size(); ++i) {
-    //    CStringA strSelectedName;
-    //    W2MB(vecSelectName.at(i), strSelectedName);
-    //    for(int j = 0; j < m_vecISOEntries.size(); ++j) {
-    //        if(m_vecISOEntries.at(j).m_strDiskName == strSelectedName) {
-    //            char szNewName[512] = {0};
-    //            int nCode = m_driveControl.UploadImageToWBFS((char*)m_vecISOEntries.at(j).m_strImagePath.GetString(), ONLY_GAME_PARTITION, false, szNewName);
-    //        }
-    //    }
-    //}
 }
 
 static void __stdcall ExtractProcess(int status, int total) {
@@ -430,7 +431,7 @@ void CMiiGameDlg::OnBnClickedFormatBtn()
     straDriveLetter.Replace(":", "");
     CloseDrive();
     if(!FormatDrive((char*)straDriveLetter.GetString())) {
-        AfxMessageBox(m_localization.GetIDString(_T("IDS_Format_failed")), MB_ICONWARNING | MB_OK);
+        AfxMessageBox(m_localization.GetIDString(_T("IDS_Format_failed")), MB_ICONERROR | MB_OK);
     } else {
         AfxMessageBox(m_localization.GetIDString(_T("IDS_Format_successfully")), MB_ICONINFORMATION | MB_OK);
     }
@@ -488,13 +489,14 @@ void CMiiGameDlg::OnBnClickedDeleteBtn2()
     SetImageListContent(true);
 }
 
-void CMiiGameDlg::OnEventUploadComplete( long nParam )
+void CMiiGameDlg::OnEventUploadComplete(long nParam)
 {
+    if(nParam == 0) return;
     CString strMsg;
     switch(nParam) {
-        case 0:
-            strMsg = m_localization.GetIDString(_T("IDS_Upload_to_WBFS_successfully"));
-            break;
+        //case 0:
+        //    strMsg = m_localization.GetIDString(_T("IDS_Upload_to_WBFS_successfully"));
+        //    break;
         case -1:
             strMsg = m_localization.GetIDString(_T("IDS_Partition_wasn't_loaded_previously"));
             break;
@@ -511,11 +513,12 @@ void CMiiGameDlg::OnEventUploadComplete( long nParam )
 
 void CMiiGameDlg::OnDownloadComplete(long nParam)
 {
+    if(nParam == 0) return;
     CString strMsg;
     switch(nParam) {
-    case 0:
-        strMsg = m_localization.GetIDString(_T("IDS_Download_successfully"));
-        break;
+    //case 0:
+    //    strMsg = m_localization.GetIDString(_T("IDS_Download_successfully"));
+    //    break;
     case -1:
         strMsg = m_localization.GetIDString(_T("IDS_Partition_wasn't_loaded_previously"));
         break;
@@ -534,4 +537,16 @@ void CMiiGameDlg::OnBnClickedButton2()
 {
     CProgressDlg pd;
     pd.DoModal();
+}
+
+void CMiiGameDlg::RenameDisk(long nParam)
+{
+    NMLVDISPINFO *pDispInfo = (NMLVDISPINFO *)nParam;
+    CStringA strNewName;
+    W2MB(pDispInfo->item.pszText, strNewName);
+    OpenDrive();
+    int nRet = RenameDiscOnDrive((char*)m_vecDiskEntries.at(pDispInfo->item.iItem).m_strDiskID.GetString(), (char*)strNewName.GetString());
+    if(nRet == 0)
+        m_vecDiskEntries.at(pDispInfo->item.iItem).m_strDiskName = strNewName;
+    CloseDrive();
 }

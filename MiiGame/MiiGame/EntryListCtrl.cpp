@@ -12,7 +12,8 @@ IMPLEMENT_DYNAMIC(CEntryListCtrl, CListCtrl)
 
 CEntryListCtrl::CEntryListCtrl()
 {
-
+    DefineNotify(EVENT_ZERO_LENGTH_EDITION);
+    DefineNotify(EVENT_CHANGE_DISK_NAME);
 }
 
 CEntryListCtrl::~CEntryListCtrl()
@@ -83,9 +84,7 @@ void CEntryListCtrl::OnLvnBeginlabeledit(NMHDR *pNMHDR, LRESULT *pResult)
 void CEntryListCtrl::OnLvnEndlabeledit(NMHDR *pNMHDR, LRESULT *pResult)
 {
     NMLVDISPINFO *pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
-    CString strEditString;
-    GetEditControl()->GetWindowText(strEditString);
-
+    Fire(EVENT_CHANGE_DISK_NAME, (long)pDispInfo);
     *pResult = 1;
 }
 
@@ -129,4 +128,8 @@ BOOL CEntryListCtrl::PreTranslateMessage(MSG* pMsg)
         }
     }
     return CListCtrl::PreTranslateMessage(pMsg);
+}
+
+void CEntryListCtrl::Event(const TSTRING& strEvent,long nParam) {
+
 }
