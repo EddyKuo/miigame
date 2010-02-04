@@ -36,6 +36,10 @@ public:
     static UINT ExtractThread(LPVOID nParam);
 
     bool GetFolder(TSTRING& folderpath, const TCHAR* szCaption = NULL, HWND hOwner = NULL);
+
+    int RenameDisk(CStringA strDiskID, CStringA strNewName);
+
+    int GetDriveStatus(unsigned int& blocks, float& total, float& used, float& free);
     void Event(const TSTRING& strEvent,long nParam);
 public:
     vector<CString> m_vecDrivers;

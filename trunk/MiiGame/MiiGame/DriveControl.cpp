@@ -57,7 +57,7 @@ vector<CImageEntry> CDriveControl::GetDiskFromDrive(CStringA strDriveLetter) {
         char szDiskID[128] = {0};
         float fDiskSize = 0;
         RegionCode regionCode = NOREGION;
-        int nRetCode = GetDiscInfoEx(i, szDiskID, &fDiskSize, szDiskName, & regionCode);
+        int nRetCode = GetDiscInfoEx(i, szDiskID, &fDiskSize, szDiskName, &regionCode);
         if(nRetCode < 0) {
             CString strMessage = GetLocalizationInstance()->GetIDString(_T("IDS_Get_Disk_Error"));
             CString strNum;
@@ -65,6 +65,23 @@ vector<CImageEntry> CDriveControl::GetDiskFromDrive(CStringA strDriveLetter) {
             AfxMessageBox(strMessage + strNum);
         } else {
             CImageEntry entry(szDiskName, szDiskID, fDiskSize, regionCode);
+            switch(regionCode) {
+                case NTSC:
+                    entry.m_strRegionCode = _T("NTSC");
+                    break;
+                case PAL:
+                    entry.m_strRegionCode = _T("PAL");
+                    break;
+                case NTSCJ:
+                    entry.m_strRegionCode = _T("NTSC-J");
+                    break;
+                case KOR:
+                    entry.m_strRegionCode = _T("KOR");
+                    break;
+                case NOREGION:
+                    entry.m_strRegionCode = _T("NOREGION");
+                    break;
+            }
             entries.push_back(entry);
         }
     }
@@ -210,4 +227,12 @@ bool CDriveControl::GetFolder(TSTRING& folderpath, const TCHAR* szCaption, HWND 
 
 void CDriveControl::Event(const TSTRING& strEvent,long nParam) {
 
+}
+
+int CDriveControl::RenameDisk(CStringA strDiskID, CStringA strNewName) {
+    return RenameDiscOnDrive((char*)strDiskID.GetString(), (char*)strNewName.GetString());
+}
+
+int CDriveControl::GetDriveStatus(unsigned int& blocks, float& total, float& used, float& free) {
+    return ::GetDriveStats(&blocks, &total, &used, &free);
 }

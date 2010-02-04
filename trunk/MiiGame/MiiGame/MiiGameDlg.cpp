@@ -241,6 +241,18 @@ void CMiiGameDlg::OnBnClickedLoadBtn()
     if(!OpenDrive()) return;
     GetDisks();
     SetInformationToList();
+    unsigned int blocks;
+    float total;
+    float used;
+    float free;
+    m_driveControl.GetDriveStatus(blocks, total, used, free);
+    CString strFormetter;
+    strFormetter.Format(_T("%.2fG"), total);
+    GetDlgItem(IDC_TOTAL_SPACE)->SetWindowText(strFormetter);
+    strFormetter.Format(_T("%.2fG"), used);
+    GetDlgItem(IDC_USED_SPACE)->SetWindowText(strFormetter);
+    strFormetter.Format(_T("%.2fG"), free);
+    GetDlgItem(IDC_FREE_SPACE)->SetWindowText(strFormetter);
     CloseDrive();
     GetDlgItem(IDC_COMBO2)->EnableWindow(FALSE);
 }
@@ -293,6 +305,8 @@ void CMiiGameDlg::SetInformationToList()
         CString strSize;
         strSize.Format(_T("%.2f GB"), m_vecDiskEntries.at(i).m_fDiskSize);
         m_diskList.SetItemText(i, 2, strSize);
+
+        m_diskList.SetItemText(i, 3, m_vecDiskEntries.at(i).m_strRegionCode);
         //m_diskList.SetItemText(i, 3, m_vecImageEntries.at(i).m_strDiskID.GetString());
     }
     m_diskList.SetRedraw(TRUE);
