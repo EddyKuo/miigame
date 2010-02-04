@@ -31,6 +31,9 @@
 #define IDC_TOTAL_SPACE                 1024
 #define IDC_USED_SPACE                  1025
 #define IDC_FREE_SPACE                  1026
+#define IDC_DESCRIPTION                 1027
+#define IDC_COMPLETE_ITEM               1028
+#define IDC_PERCENTAGE                  1029
 
 // Next default values for new objects
 // 
@@ -38,7 +41,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1027
+#define _APS_NEXT_CONTROL_VALUE         1030
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

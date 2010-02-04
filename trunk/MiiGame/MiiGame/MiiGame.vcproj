@@ -291,6 +291,30 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="UIComponent"
+			>
+			<File
+				RelativePath="..\UIComponent\Color.h"
+				>
+			</File>
+			<File
+				RelativePath="..\UIComponent\ColorEdit.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\UIComponent\ColorEdit.h"
+				>
+			</File>
+			<File
+				RelativePath="..\UIComponent\ColorStatic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\UIComponent\ColorStatic.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\MiiGame.exe.manifest"
 			>
