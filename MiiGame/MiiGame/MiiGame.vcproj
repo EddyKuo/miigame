@@ -207,6 +207,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ProgressDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -257,6 +261,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ProgressDlg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Resource.h"
 				>
 			</File>
@@ -283,6 +291,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\MiiGame.exe.manifest"
+			>
+		</File>
 		<File
 			RelativePath=".\ReadMe.txt"
 			>

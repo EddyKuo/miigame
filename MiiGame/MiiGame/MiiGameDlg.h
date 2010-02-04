@@ -42,6 +42,7 @@ private:
     CComboBox m_folderDropList;
     CLocalization m_localization;
     CProgressCtrl m_progress;
+    CStatusBar m_bar;
 
 private:
     bool OpenDrive();

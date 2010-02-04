@@ -7,7 +7,7 @@
 #include "../libwbfsNETwrapper/WbfsInterm.h"
 #include "shlobj.h"
 #include <string>
-
+#include "ProgressDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -125,6 +125,21 @@ BOOL CMiiGameDlg::OnInitDialog()
 
     OnBnClickedUpdateDriveBtn();
     InitListCcontrol();
+
+    static UINT BASED_CODE indicators[] = {
+        IDS_INDICATOR_INFO,
+        IDS_INDICATOR_TIME
+    };
+    m_bar.Create(this); //We create the status bar
+    m_bar.SetIndicators(indicators,2); //Set the number of panes 
+    CRect rect;
+    GetClientRect(&rect);
+
+    m_bar.SetPaneInfo(0, IDS_INDICATOR_INFO, SBPS_NORMAL,rect.Width()-100);
+    m_bar.SetPaneInfo(1, IDS_INDICATOR_TIME, SBPS_STRETCH ,0);
+
+    RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, IDS_INDICATOR_TIME);
+    //m_bar.GetStatusBarCtrl().SetBkColor(RGB(180,180,180));
     return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -503,6 +518,6 @@ void CMiiGameDlg::OnDownloadComplete(long nParam)
 
 void CMiiGameDlg::OnBnClickedButton2()
 {
-#include "ProgressDlg.h"
     CProgressDlg pd;
+    pd.DoModal();
 }

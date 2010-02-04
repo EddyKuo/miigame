@@ -160,7 +160,7 @@ UINT CDriveControl::ExtractThread(LPVOID nParam) {
     TSTRING strPath;
     p->pThis->GetFolder(strPath, _T("Mii Game Manager"));
     if(strPath == _T("")) {
-        AfxMessageBox(_T("Please select a folder to download"), MB_ICONINFORMATION, MB_OK);
+        //AfxMessageBox(_T("Please select a folder to download"), MB_ICONINFORMATION, MB_OK);
         p->pThis->Fire(EVENT_DOWNLOAD_FAILED);
         delete p->pvecSelectName;
         delete p;
