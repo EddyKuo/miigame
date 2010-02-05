@@ -4,12 +4,12 @@
 #include "NotifyBase.h"
 
 static TSTRING EVENT_UPLOAD_ALL_COMPLETE = _T("Upload All Complete");
-static TSTRING EVENT_UPLOAD_COMPLETE = _T("Upload Complete");
+static TSTRING EVENT_UPLOAD_COMPLETE = _T("Upload Complete"); // 1 complete or error
 static TSTRING EVENT_UPLOAD_FAILED = _T("Upload Failed");
 static TSTRING EVENT_UPLOAD_PROGRESS = _T("Upload Progress");
 
 static TSTRING EVENT_DOWNLOAD_ALL_COMPLETE = _T("Download All Complete");
-static TSTRING EVENT_DOWNLOAD_COMPLETE = _T("Download Complete");
+static TSTRING EVENT_DOWNLOAD_COMPLETE = _T("Download Complete"); // 1 complete or error
 static TSTRING EVENT_DOWNLOAD_FAILED = _T("Download Failed");
 static TSTRING EVENT_DOWNLOAD_PROGRESS = _T("Download Progress");
 
