@@ -21,8 +21,8 @@
 #define IDC_LIST4                       1013
 #define IDC_BUTTON5                     1014
 #define IDC_OPEN_FILE_BTN               1014
-#define IDC_MOVE_LEFT_BTN               1015
-#define IDC_MOVE_RIGHT_BTN              1016
+#define IDC_UPLOAD_BTN               1015
+#define IDC_DOWNLOAD_BTN              1016
 #define IDC_DELETE_BTN2                 1017
 #define IDC_FOLDER_COMBO                1019
 #define IDC_FORMAT_BTN                  1020

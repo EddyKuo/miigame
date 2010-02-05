@@ -41,7 +41,6 @@ private:
     CComboBox m_driveCombo;
     CComboBox m_folderDropList;
     CLocalization m_localization;
-    CProgressCtrl m_progress;
     CStatusBar m_bar;
 
 private:
@@ -50,8 +49,8 @@ private:
     void SetInformationToList();
     void SetImageListContent(bool bCleanOriginalList);
     void InitListCcontrol();
-    void OnEventUploadComplete(long nParam);
-    void OnDownloadComplete(long nParam);
+    void OnEventUploadError(long nParam);
+    void OnEventDownloadError(long nParam);
     void UpdateUIString(LCID lcid);
     void RenameDisk( long nParam );
 
@@ -68,8 +67,8 @@ protected:
     afx_msg void OnBnClickedLoadBtn();
     afx_msg void OnBnClickedUpdateDriveBtn();
     afx_msg void OnBnClickedOpenFileBtn();
-    afx_msg void OnBnClickedMoveLeftBtn();
-    afx_msg void OnBnClickedMoveRightBtn();
+    afx_msg void OnBnClickedUploadBtn();
+    afx_msg void OnBnClickedDownloadBtn();
     afx_msg void OnBnClickedFormatBtn();
     afx_msg void OnBnClickedDeleteBtn();
     afx_msg void OnBnClickedDeleteBtn2();

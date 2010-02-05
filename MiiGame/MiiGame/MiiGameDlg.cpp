@@ -56,13 +56,13 @@ CMiiGameDlg::CMiiGameDlg(CWnd* pParent /*=NULL*/)
 {
     m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
     pCMiiGameDlg = this;
-    m_driveControl.Register(this, EVENT_UPLOAD_COMPLETE);
-    m_driveControl.Register(this, EVENT_UPLOAD_PROGRESS);
+    //m_driveControl.Register(this, EVENT_UPLOAD_COMPLETE);
+    //m_driveControl.Register(this, EVENT_UPLOAD_PROGRESS);
     m_driveControl.Register(this, EVENT_UPLOAD_ALL_COMPLETE);
     m_driveControl.Register(this, EVENT_UPLOAD_FAILED);
 
-    m_driveControl.Register(this, EVENT_DOWNLOAD_COMPLETE);
-    m_driveControl.Register(this, EVENT_DOWNLOAD_PROGRESS);
+    //m_driveControl.Register(this, EVENT_DOWNLOAD_COMPLETE);
+    //m_driveControl.Register(this, EVENT_DOWNLOAD_PROGRESS);
     m_driveControl.Register(this, EVENT_DOWNLOAD_ALL_COMPLETE);
     m_driveControl.Register(this, EVENT_DOWNLOAD_FAILED);
 
@@ -77,7 +77,6 @@ void CMiiGameDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_LIST3, m_diskList);
     DDX_Control(pDX, IDC_LIST4, m_isoList);
     DDX_Control(pDX, IDC_FOLDER_COMBO, m_folderDropList);
-    DDX_Control(pDX, IDC_PROGRESS1, m_progress);
 }
 
 BEGIN_MESSAGE_MAP(CMiiGameDlg, CDialog)
@@ -88,8 +87,8 @@ BEGIN_MESSAGE_MAP(CMiiGameDlg, CDialog)
     ON_BN_CLICKED(IDC_LOAD_BTN, &CMiiGameDlg::OnBnClickedLoadBtn)
     ON_BN_CLICKED(IDC_UPDATE_DRIVE_BTN, &CMiiGameDlg::OnBnClickedUpdateDriveBtn)
     ON_BN_CLICKED(IDC_OPEN_FILE_BTN, &CMiiGameDlg::OnBnClickedOpenFileBtn)
-    ON_BN_CLICKED(IDC_MOVE_LEFT_BTN, &CMiiGameDlg::OnBnClickedMoveLeftBtn)
-    ON_BN_CLICKED(IDC_MOVE_RIGHT_BTN, &CMiiGameDlg::OnBnClickedMoveRightBtn)
+    ON_BN_CLICKED(IDC_UPLOAD_BTN, &CMiiGameDlg::OnBnClickedUploadBtn)
+    ON_BN_CLICKED(IDC_DOWNLOAD_BTN, &CMiiGameDlg::OnBnClickedDownloadBtn)
     ON_BN_CLICKED(IDC_FORMAT_BTN, &CMiiGameDlg::OnBnClickedFormatBtn)
     ON_BN_CLICKED(IDC_DELETE_BTN, &CMiiGameDlg::OnBnClickedDeleteBtn)
     ON_BN_CLICKED(IDC_DELETE_BTN2, &CMiiGameDlg::OnBnClickedDeleteBtn2)
@@ -195,19 +194,19 @@ HCURSOR CMiiGameDlg::OnQueryDragIcon()
 
 void CMiiGameDlg::Event(const TSTRING& strEvent,long nParam) {
     if(strEvent == EVENT_UPLOAD_COMPLETE) {
-        OnEventUploadComplete(nParam);
+        OnEventUploadError(nParam);
     } else if(strEvent == EVENT_UPLOAD_PROGRESS) {
-        int nStatus = nParam >> 16, nTotal = nParam & 0xFFFF;
-        int nPercentage = (int) (((float)nStatus) / ((float)nTotal) * 100);
-        m_progress.SetPos(nPercentage);
-        m_progress.UpdateWindow();
+        //int nStatus = nParam >> 16, nTotal = nParam & 0xFFFF;
+        //int nPercentage = (int) (((float)nStatus) / ((float)nTotal) * 100);
+        //m_progress.SetPos(nPercentage);
+        //m_progress.UpdateWindow();
     } else if(strEvent == EVENT_DOWNLOAD_COMPLETE) {
-        OnDownloadComplete(nParam);
+        OnEventDownloadError(nParam);
     } else if(strEvent == EVENT_DOWNLOAD_PROGRESS) {
-        int nStatus = nParam >> 16, nTotal = nParam & 0xFFFF;
-        int nPercentage = (int) (((float)nStatus) / ((float)nTotal) * 100);
-        m_progress.SetPos(nPercentage);
-        m_progress.UpdateWindow();
+        //int nStatus = nParam >> 16, nTotal = nParam & 0xFFFF;
+        //int nPercentage = (int) (((float)nStatus) / ((float)nTotal) * 100);
+        //m_progress.SetPos(nPercentage);
+        //m_progress.UpdateWindow();
     } else if(strEvent == EVENT_UPLOAD_ALL_COMPLETE) {
         AfxMessageBox(m_localization.GetIDString(_T("IDS_Upload_to_WBFS_successfully")), MB_OK);
         CloseDrive();
@@ -223,7 +222,6 @@ void CMiiGameDlg::Event(const TSTRING& strEvent,long nParam) {
         SetImageListContent(true);
     } else if(strEvent == EVENT_CHANGE_DISK_NAME) {
         RenameDisk(nParam);
-
     }
 }
 
@@ -382,7 +380,7 @@ void CMiiGameDlg::MB2W(const CStringA& a, CString& b) {
     delete [] pwText;
 }
 
-void CMiiGameDlg::OnBnClickedMoveLeftBtn()
+void CMiiGameDlg::OnBnClickedUploadBtn()
 {
     // Add disk to drive (from your HD to WBFS)
     vector<CString>* pvecSelectName = new vector<CString>();
@@ -393,19 +391,24 @@ void CMiiGameDlg::OnBnClickedMoveLeftBtn()
         CString strItemText = m_isoList.GetItemText(nItem, 0);
         pvecSelectName->push_back(strItemText);
     }
+    CString strCompleteItem;
+    strCompleteItem.Format(_T("0/%d"), pvecSelectName->size());
+    CProgressDlg pd(_T("Upload"), strCompleteItem, _T("0.00"));
+    pd.SetItemInformation(0, (int)pvecSelectName->size());
+    m_driveControl.Register(&pd, EVENT_UPLOAD_COMPLETE);
+    m_driveControl.Register(&pd, EVENT_UPLOAD_ALL_COMPLETE);
+    m_driveControl.Register(&pd, EVENT_UPLOAD_PROGRESS);
     if(this->OpenDrive() != true) return;
     m_driveControl.UploadImageToWBFS(pvecSelectName, m_vecISOEntries);
+    pd.DoModal();
+    m_driveControl.Unregister(&pd, EVENT_UPLOAD_COMPLETE);
+    m_driveControl.Unregister(&pd, EVENT_UPLOAD_ALL_COMPLETE);
+    m_driveControl.Unregister(&pd, EVENT_UPLOAD_PROGRESS);
 }
 
-static void __stdcall ExtractProcess(int status, int total) {
-    float nPercentage = (float)status / (float)total;
-    CString strMsg;
-    strMsg.Format(_T("%.2f\n"), nPercentage);
-    TRACE(strMsg.GetString());
-}
-
-void CMiiGameDlg::OnBnClickedMoveRightBtn()
+void CMiiGameDlg::OnBnClickedDownloadBtn()
 {
+    // Extract the image from the WBFS to your HD
     vector<CString>* pvecSelectName = new vector<CString>();
     POSITION pos = m_diskList.GetFirstSelectedItemPosition();
     if(pos == NULL) return;
@@ -414,9 +417,19 @@ void CMiiGameDlg::OnBnClickedMoveRightBtn()
         CString strItemText = m_diskList.GetItemText(nItem, 0);
         pvecSelectName->push_back(strItemText);
     }
-
+    CString strCompleteItem;
+    strCompleteItem.Format(_T("0/%d"), pvecSelectName->size());
+    CProgressDlg pd(_T("Upload"), strCompleteItem, _T("0.00"));
+    pd.SetItemInformation(0, (int)pvecSelectName->size());
+    m_driveControl.Register(&pd, EVENT_DOWNLOAD_COMPLETE);
+    m_driveControl.Register(&pd, EVENT_DOWNLOAD_ALL_COMPLETE);
+    m_driveControl.Register(&pd, EVENT_DOWNLOAD_PROGRESS);
     if(!this->OpenDrive()) return;
     m_driveControl.ExtractDiskToHD(pvecSelectName, m_vecDiskEntries);
+    pd.DoModal();
+    m_driveControl.Unregister(&pd, EVENT_DOWNLOAD_COMPLETE);
+    m_driveControl.Unregister(&pd, EVENT_DOWNLOAD_ALL_COMPLETE);
+    m_driveControl.Unregister(&pd, EVENT_DOWNLOAD_PROGRESS);
 }
 
 void CMiiGameDlg::OnBnClickedFormatBtn()
@@ -489,14 +502,11 @@ void CMiiGameDlg::OnBnClickedDeleteBtn2()
     SetImageListContent(true);
 }
 
-void CMiiGameDlg::OnEventUploadComplete(long nParam)
+void CMiiGameDlg::OnEventUploadError(long nParam)
 {
     if(nParam == 0) return;
     CString strMsg;
     switch(nParam) {
-        //case 0:
-        //    strMsg = m_localization.GetIDString(_T("IDS_Upload_to_WBFS_successfully"));
-        //    break;
         case -1:
             strMsg = m_localization.GetIDString(_T("IDS_Partition_wasn't_loaded_previously"));
             break;
@@ -507,18 +517,14 @@ void CMiiGameDlg::OnEventUploadComplete(long nParam)
             strMsg = m_localization.GetIDString(_T("IDS_Disc_already_exists_on_WBFS_drive"));
             break;
     }
-    m_progress.SetPos(0);
     AfxMessageBox(strMsg, nParam == 0 ? MB_ICONWARNING | MB_OK : MB_OK);
 }
 
-void CMiiGameDlg::OnDownloadComplete(long nParam)
+void CMiiGameDlg::OnEventDownloadError(long nParam)
 {
     if(nParam == 0) return;
     CString strMsg;
     switch(nParam) {
-    //case 0:
-    //    strMsg = m_localization.GetIDString(_T("IDS_Download_successfully"));
-    //    break;
     case -1:
         strMsg = m_localization.GetIDString(_T("IDS_Partition_wasn't_loaded_previously"));
         break;
@@ -529,14 +535,12 @@ void CMiiGameDlg::OnDownloadComplete(long nParam)
         strMsg = m_localization.GetIDString(_T("IDS_Unable_to_open_file_on_disk_for_writing"));
         break;
     }
-    m_progress.SetPos(0);
     AfxMessageBox(strMsg, nParam == 0 ? MB_ICONWARNING | MB_OK : MB_OK);
 }
 
 void CMiiGameDlg::OnBnClickedButton2()
 {
-    CProgressDlg pd;
-    pd.DoModal();
+
 }
 
 void CMiiGameDlg::RenameDisk(long nParam)
