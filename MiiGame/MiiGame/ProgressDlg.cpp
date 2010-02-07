@@ -59,9 +59,9 @@ BOOL CProgressDlg::OnInitDialog()
     CDialog::OnInitDialog();
 
     // TODO:  Add extra initialization here
-    m_descript.SetBkColor(RGB(0, 200, 0));
-    m_complete.SetBkColor(RGB(0, 200, 0));
-    m_percentage.SetBkColor(RGB(0, 200, 0));
+    //m_descript.SetBkColor(RGB(0, 200, 0));
+    //m_complete.SetBkColor(RGB(0, 200, 0));
+    //m_percentage.SetBkColor(RGB(0, 200, 0));
 
     m_descript.SetWindowText(m_desc);
     m_complete.SetWindowText(m_comp);
