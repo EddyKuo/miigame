@@ -419,7 +419,7 @@ void CMiiGameDlg::OnBnClickedDownloadBtn()
     }
     CString strCompleteItem;
     strCompleteItem.Format(_T("0/%d"), pvecSelectName->size());
-    CProgressDlg pd(_T("Upload"), strCompleteItem, _T("0.00"));
+    CProgressDlg pd(_T("Download"), strCompleteItem, _T("0.00"));
     pd.SetItemInformation(0, (int)pvecSelectName->size());
     m_driveControl.Register(&pd, EVENT_DOWNLOAD_COMPLETE);
     m_driveControl.Register(&pd, EVENT_DOWNLOAD_ALL_COMPLETE);
