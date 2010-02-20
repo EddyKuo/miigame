@@ -32,4 +32,6 @@ protected:
     DECLARE_MESSAGE_MAP()
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
     virtual BOOL OnInitDialog();
+public:
+    afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
