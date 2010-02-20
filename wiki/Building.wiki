@@ -1,5 +1,5 @@
 #labels Featured,Phase-Implementation
-= Compiling for Visual Studio 2009 =
+= Compiling for Visual Studio 2008 =
 
 * Get the source code from Source.
 * Open the file named "MiiGame.sln".
