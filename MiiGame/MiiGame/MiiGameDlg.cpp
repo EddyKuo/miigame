@@ -392,8 +392,8 @@ void CMiiGameDlg::OnBnClickedUploadBtn()
         pvecSelectName->push_back(strItemText);
     }
     CString strCompleteItem;
-    strCompleteItem.Format(_T("0/%d"), pvecSelectName->size());
-    CProgressDlg pd(_T("Upload"), strCompleteItem, _T("0.00"));
+    strCompleteItem.Format(_T(" 0/%d"), pvecSelectName->size());
+    CProgressDlg pd(m_localization.GetIDString(_T("IDS_Uploading")), m_localization.GetIDString(_T("IDS_Total_Complete")) + strCompleteItem, _T("0.00"));
     pd.SetItemInformation(0, (int)pvecSelectName->size());
     m_driveControl.Register(&pd, EVENT_UPLOAD_COMPLETE);
     m_driveControl.Register(&pd, EVENT_UPLOAD_ALL_COMPLETE);
@@ -418,8 +418,8 @@ void CMiiGameDlg::OnBnClickedDownloadBtn()
         pvecSelectName->push_back(strItemText);
     }
     CString strCompleteItem;
-    strCompleteItem.Format(_T("0/%d"), pvecSelectName->size());
-    CProgressDlg pd(_T("Download"), strCompleteItem, _T("0.00"));
+    strCompleteItem.Format(_T(" 0/%d"), pvecSelectName->size());
+    CProgressDlg pd(m_localization.GetIDString(_T("IDS_Downloading")), m_localization.GetIDString(_T("IDS_Total_Complete")) + strCompleteItem, _T("0.00"));
     pd.SetItemInformation(0, (int)pvecSelectName->size());
     m_driveControl.Register(&pd, EVENT_DOWNLOAD_COMPLETE);
     m_driveControl.Register(&pd, EVENT_DOWNLOAD_ALL_COMPLETE);

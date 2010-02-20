@@ -121,7 +121,7 @@ BEGIN
     LTEXT           "Complete / Total",IDC_COMPLETE_ITEM,15,33,220,8
     LTEXT           "Download or Upload",IDC_DESCRIPTION,15,16,220,8
     LTEXT           "Percentage",IDC_PERCENTAGE,15,50,220,8
-    LTEXT           "/--",IDC_STATIC,250,70,14,8,0,WS_EX_TRANSPARENT
+    LTEXT           "/--",IDC_PROG_ANIMATE,250,70,14,8,0,WS_EX_TRANSPARENT
 END
 
 

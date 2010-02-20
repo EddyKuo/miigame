@@ -21,8 +21,8 @@
 #define IDC_LIST4                       1013
 #define IDC_BUTTON5                     1014
 #define IDC_OPEN_FILE_BTN               1014
-#define IDC_UPLOAD_BTN               1015
-#define IDC_DOWNLOAD_BTN              1016
+#define IDC_UPLOAD_BTN                  1015
+#define IDC_DOWNLOAD_BTN                1016
 #define IDC_DELETE_BTN2                 1017
 #define IDC_FOLDER_COMBO                1019
 #define IDC_FORMAT_BTN                  1020
@@ -34,6 +34,7 @@
 #define IDC_DESCRIPTION                 1027
 #define IDC_COMPLETE_ITEM               1028
 #define IDC_PERCENTAGE                  1029
+#define IDC_PROG_ANIMATE                1030
 
 // Next default values for new objects
 // 
@@ -41,7 +42,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1030
+#define _APS_NEXT_CONTROL_VALUE         1031
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif
