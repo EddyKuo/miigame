@@ -23,6 +23,7 @@ CProgressDlg::CProgressDlg(CString strDrsc, CString strComp, CString strPencetag
 
 CProgressDlg::~CProgressDlg()
 {
+    ReleaseLocalizationInstance();
 }
 
 void CProgressDlg::DoDataExchange(CDataExchange* pDX)
