@@ -2,7 +2,10 @@
 #include "NotifyBase.h"
 #include "../UIComponent/ColorStatic.h"
 #include "afxcmn.h"
+#include <map>
 // CProgressDlg dialog
+
+using namespace std;
 
 class CProgressDlg : public CDialog, public INotify
 {
@@ -28,6 +31,7 @@ private:
     CColorStatic m_complete;
     CColorStatic m_percentage;
     CProgressCtrl m_progressbar;
+    map<int, CString> m_mapMotion;
 protected:
     DECLARE_MESSAGE_MAP()
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

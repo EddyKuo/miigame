@@ -38,6 +38,7 @@ void CProgressDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CProgressDlg, CDialog)
     ON_WM_TIMER()
+    ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -65,19 +66,13 @@ BOOL CProgressDlg::OnInitDialog()
 {
     CDialog::OnInitDialog();
 
-    // TODO:  Add extra initialization here
-    //m_descript.SetBkColor(RGB(0, 200, 0));
-    //m_complete.SetBkColor(RGB(0, 200, 0));
-    //m_percentage.SetBkColor(RGB(0, 200, 0));
-
     m_descript.SetWindowText(m_desc);
     m_complete.SetWindowText(m_comp);
     m_percentage.SetWindowText(m_perc);
     GetDlgItem(IDC_PROG_ANIMATE)->SetWindowText(_T(""));
     m_bInitialized = true;
 
-    //GetDlgItem(IDOK)->EnableWindow(FALSE);
-    //GetDlgItem(IDCANCEL)->EnableWindow(FALSE);
+    SetTimer(1, 500, NULL);
     SetTimer(1, 500, NULL);
 
     return TRUE;  

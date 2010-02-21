@@ -34,6 +34,7 @@
 #define IDC_DESCRIPTION                 1027
 #define IDC_COMPLETE_ITEM               1028
 #define IDC_PERCENTAGE                  1029
+#define IDC_MOTION                      1030
 #define IDC_PROG_ANIMATE                1030
 
 // Next default values for new objects
