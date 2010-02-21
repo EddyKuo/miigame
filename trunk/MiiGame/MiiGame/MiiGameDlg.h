@@ -52,7 +52,8 @@ private:
     void OnEventUploadError(long nParam);
     void OnEventDownloadError(long nParam);
     void UpdateUIString(LCID lcid);
-    void RenameDisk( long nParam );
+    void RenameDisk(long nParam);
+    int GetSelectedList(CListCtrl* pList, vector<CString>& vecSelectName);
 
     // Implementation
 protected:

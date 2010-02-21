@@ -196,17 +196,9 @@ void CMiiGameDlg::Event(const TSTRING& strEvent,long nParam) {
     if(strEvent == EVENT_UPLOAD_COMPLETE) {
         OnEventUploadError(nParam);
     } else if(strEvent == EVENT_UPLOAD_PROGRESS) {
-        //int nStatus = nParam >> 16, nTotal = nParam & 0xFFFF;
-        //int nPercentage = (int) (((float)nStatus) / ((float)nTotal) * 100);
-        //m_progress.SetPos(nPercentage);
-        //m_progress.UpdateWindow();
     } else if(strEvent == EVENT_DOWNLOAD_COMPLETE) {
         OnEventDownloadError(nParam);
     } else if(strEvent == EVENT_DOWNLOAD_PROGRESS) {
-        //int nStatus = nParam >> 16, nTotal = nParam & 0xFFFF;
-        //int nPercentage = (int) (((float)nStatus) / ((float)nTotal) * 100);
-        //m_progress.SetPos(nPercentage);
-        //m_progress.UpdateWindow();
     } else if(strEvent == EVENT_UPLOAD_ALL_COMPLETE) {
         AfxMessageBox(m_localization.GetIDString(_T("IDS_Upload_to_WBFS_successfully")), MB_OK);
         CloseDrive();
@@ -380,17 +372,22 @@ void CMiiGameDlg::MB2W(const CStringA& a, CString& b) {
     delete [] pwText;
 }
 
+int CMiiGameDlg::GetSelectedList(CListCtrl* pList, vector<CString>& vecSelectName) {
+    POSITION pos = pList->GetFirstSelectedItemPosition();
+    if(pos == NULL) return 0;
+    while(pos != NULL) {
+        int nItem = pList->GetNextSelectedItem(pos);
+        CString strItemText = pList->GetItemText(nItem, 0);
+        vecSelectName.push_back(strItemText);
+    }
+    return (int)vecSelectName.size();
+}
+
 void CMiiGameDlg::OnBnClickedUploadBtn()
 {
     // Add disk to drive (from your HD to WBFS)
     vector<CString>* pvecSelectName = new vector<CString>();
-    POSITION pos = m_isoList.GetFirstSelectedItemPosition();
-    if(pos == NULL) return;
-    while(pos != NULL) {
-        int nItem = m_isoList.GetNextSelectedItem(pos);
-        CString strItemText = m_isoList.GetItemText(nItem, 0);
-        pvecSelectName->push_back(strItemText);
-    }
+    if(GetSelectedList(&m_isoList, *pvecSelectName) == 0) return;
     CString strCompleteItem;
     strCompleteItem.Format(_T(" 0/%d"), pvecSelectName->size());
     CProgressDlg pd(m_localization.GetIDString(_T("IDS_Uploading")), m_localization.GetIDString(_T("IDS_Total_Complete")) + strCompleteItem, _T("0.00"));
@@ -398,7 +395,7 @@ void CMiiGameDlg::OnBnClickedUploadBtn()
     m_driveControl.Register(&pd, EVENT_UPLOAD_COMPLETE);
     m_driveControl.Register(&pd, EVENT_UPLOAD_ALL_COMPLETE);
     m_driveControl.Register(&pd, EVENT_UPLOAD_PROGRESS);
-    if(this->OpenDrive() != true) return;
+    if(!this->OpenDrive()) return;
     m_driveControl.UploadImageToWBFS(pvecSelectName, m_vecISOEntries);
     pd.DoModal();
     m_driveControl.Unregister(&pd, EVENT_UPLOAD_COMPLETE);
@@ -410,13 +407,7 @@ void CMiiGameDlg::OnBnClickedDownloadBtn()
 {
     // Extract the image from the WBFS to your HD
     vector<CString>* pvecSelectName = new vector<CString>();
-    POSITION pos = m_diskList.GetFirstSelectedItemPosition();
-    if(pos == NULL) return;
-    while(pos != NULL) {
-        int nItem = m_diskList.GetNextSelectedItem(pos);
-        CString strItemText = m_diskList.GetItemText(nItem, 0);
-        pvecSelectName->push_back(strItemText);
-    }
+    if(GetSelectedList(&m_diskList, *pvecSelectName) == 0) return;
     CString strCompleteItem;
     strCompleteItem.Format(_T(" 0/%d"), pvecSelectName->size());
     CProgressDlg pd(m_localization.GetIDString(_T("IDS_Downloading")), m_localization.GetIDString(_T("IDS_Total_Complete")) + strCompleteItem, _T("0.00"));
