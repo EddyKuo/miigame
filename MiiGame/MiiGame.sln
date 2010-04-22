@@ -18,6 +18,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnRAR", "unrar\UnRARDll.vcp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Localization", "Localization\Localization.vcproj", "{95A5D091-30C3-46AA-8C09-8D1411CC730D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WiiGameManager", "WiiGameManager\WiiGameManager.vcproj", "{511C12F5-F08B-4B89-9311-86B2D28033C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -55,6 +57,12 @@ Global
 		{95A5D091-30C3-46AA-8C09-8D1411CC730D}.release_nocrypt|Win32.Build.0 = Release|Win32
 		{95A5D091-30C3-46AA-8C09-8D1411CC730D}.Release|Win32.ActiveCfg = Release|Win32
 		{95A5D091-30C3-46AA-8C09-8D1411CC730D}.Release|Win32.Build.0 = Release|Win32
+		{511C12F5-F08B-4B89-9311-86B2D28033C0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{511C12F5-F08B-4B89-9311-86B2D28033C0}.Debug|Win32.Build.0 = Debug|Win32
+		{511C12F5-F08B-4B89-9311-86B2D28033C0}.release_nocrypt|Win32.ActiveCfg = Release|Win32
+		{511C12F5-F08B-4B89-9311-86B2D28033C0}.release_nocrypt|Win32.Build.0 = Release|Win32
+		{511C12F5-F08B-4B89-9311-86B2D28033C0}.Release|Win32.ActiveCfg = Release|Win32
+		{511C12F5-F08B-4B89-9311-86B2D28033C0}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
