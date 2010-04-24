@@ -5,6 +5,7 @@
 
 static TSTRING EVENT_ZERO_LENGTH_EDITION = _T("Zero Length");
 static TSTRING EVENT_CHANGE_DISK_NAME = _T("Change Name");
+static TSTRING EVENT_DROP_FILES = _T("Drop Files");
 
 class CEntryListCtrl : public CListCtrl, public CINotifyBase
 {
@@ -22,6 +23,8 @@ protected:
     afx_msg void OnLvnBeginlabeledit(NMHDR *pNMHDR, LRESULT *pResult);
     afx_msg void OnLvnEndlabeledit(NMHDR *pNMHDR, LRESULT *pResult);
     virtual BOOL PreTranslateMessage(MSG* pMsg);
+public:
+    afx_msg void OnDropFiles(HDROP hDropInfo);
 };
 
 
