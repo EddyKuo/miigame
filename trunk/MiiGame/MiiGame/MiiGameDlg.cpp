@@ -68,6 +68,7 @@ CMiiGameDlg::CMiiGameDlg(CWnd* pParent /*=NULL*/)
 
     m_isoList.Register(this, EVENT_ZERO_LENGTH_EDITION);
     m_diskList.Register(this, EVENT_CHANGE_DISK_NAME);
+    m_diskList.Register(this, EVENT_DROP_FILES);
 }
 
 void CMiiGameDlg::DoDataExchange(CDataExchange* pDX)
@@ -214,6 +215,9 @@ void CMiiGameDlg::Event(const TSTRING& strEvent,long nParam) {
         SetImageListContent(true);
     } else if(strEvent == EVENT_CHANGE_DISK_NAME) {
         RenameDisk(nParam);
+    } else if(strEvent == EVENT_DROP_FILES) {
+        vector<CStringA>* vecFiles = (vector<CStringA>*)nParam;
+        // call write flie to HD.
     }
 }
 
@@ -499,14 +503,14 @@ void CMiiGameDlg::OnEventUploadError(long nParam)
     CString strMsg;
     switch(nParam) {
         case -1:
-            strMsg = m_localization.GetIDString(_T("IDS_Partition_wasn't_loaded_previously"));
-            break;
+        strMsg = m_localization.GetIDString(_T("IDS_Partition_wasn't_loaded_previously"));
+        break;
         case -2:
-            strMsg = m_localization.GetIDString(_T("IDS_Error_occured_while_attempting_to_read_file"));
-            break;
+        strMsg = m_localization.GetIDString(_T("IDS_Error_occured_while_attempting_to_read_file"));
+        break;
         case -3:
-            strMsg = m_localization.GetIDString(_T("IDS_Disc_already_exists_on_WBFS_drive"));
-            break;
+        strMsg = m_localization.GetIDString(_T("IDS_Disc_already_exists_on_WBFS_drive"));
+        break;
     }
     AfxMessageBox(strMsg, nParam == 0 ? MB_ICONWARNING | MB_OK : MB_OK);
 }
@@ -516,13 +520,13 @@ void CMiiGameDlg::OnEventDownloadError(long nParam)
     if(nParam == 0) return;
     CString strMsg;
     switch(nParam) {
-    case -1:
+        case -1:
         strMsg = m_localization.GetIDString(_T("IDS_Partition_wasn't_loaded_previously"));
         break;
-    case -2:
+        case -2:
         strMsg = m_localization.GetIDString(_T("IDS_File_could_not_be_found_on_WBFS_drive"));
         break;
-    case -3:
+        case -3:
         strMsg = m_localization.GetIDString(_T("IDS_Unable_to_open_file_on_disk_for_writing"));
         break;
     }

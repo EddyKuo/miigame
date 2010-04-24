@@ -14,6 +14,7 @@ CEntryListCtrl::CEntryListCtrl()
 {
     DefineNotify(EVENT_ZERO_LENGTH_EDITION);
     DefineNotify(EVENT_CHANGE_DISK_NAME);
+    DefineNotify(EVENT_DROP_FILES);
 }
 
 CEntryListCtrl::~CEntryListCtrl()
@@ -25,13 +26,12 @@ BEGIN_MESSAGE_MAP(CEntryListCtrl, CListCtrl)
     ON_WM_KEYDOWN()
     ON_NOTIFY_REFLECT(LVN_BEGINLABELEDIT, &CEntryListCtrl::OnLvnBeginlabeledit)
     ON_NOTIFY_REFLECT(LVN_ENDLABELEDIT, &CEntryListCtrl::OnLvnEndlabeledit)
+    ON_WM_DROPFILES()
 END_MESSAGE_MAP()
 
 
 
 // CEntryListCtrl message handlers
-
-
 
 void CEntryListCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
@@ -132,4 +132,22 @@ BOOL CEntryListCtrl::PreTranslateMessage(MSG* pMsg)
 
 void CEntryListCtrl::Event(const TSTRING& strEvent,long nParam) {
 
+}
+void CEntryListCtrl::OnDropFiles(HDROP hDropInfo)
+{
+    // TODO: Add your message handler code here and/or call default
+    int nFileCount = DragQueryFileA(hDropInfo,0xFFFFFFFF, NULL, 0);
+    vector<CStringA> vecFiles;
+    for(int i = 0; i < nFileCount; ++i) {
+        int nNameLength = DragQueryFileA(hDropInfo, i, NULL, 0);
+        char* szFileName = new char[nNameLength + 2];
+        memset(szFileName, 0, nNameLength + 2);
+        if(DragQueryFileA(hDropInfo, i, szFileName, nNameLength + 2) != 0) {
+            vecFiles.push_back(szFileName);
+        }
+        delete szFileName;
+    }
+    TRACE("Files dropped...");
+    Fire(EVENT_DROP_FILES, (long)&vecFiles);
+    __super::OnDropFiles(hDropInfo);
 }
